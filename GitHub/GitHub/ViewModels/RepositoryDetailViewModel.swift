@@ -6,13 +6,15 @@
 //
 
 import Foundation
+import UIKit
 import Combine
+import Down
 
 class RepositoryDetailViewModel: ObservableObject {
     @Published var repository: Repository?
     @Published var isLoading: Bool = false
     @Published var error: Error?
-    @Published var readme: String?
+    @Published var readme: NSAttributedString?
     @Published var isLoadingReadme: Bool = false
     
     private let repositoryService: RepositoryServiceProtocol
@@ -52,23 +54,41 @@ class RepositoryDetailViewModel: ObservableObject {
         
         networkService.request(endpoint: endpoint, method: .get) { [weak self] (result: Result<ReadmeResponse, Error>) in
             DispatchQueue.main.async {
-                self?.isLoadingReadme = false
+                guard let self else { return }
+                self.isLoadingReadme = false
                 switch result {
                 case .success(let response):
                     // Decode base64 content
                     if let data = Data(base64Encoded: response.content, options: .ignoreUnknownCharacters),
                        let decodedReadme = String(data: data, encoding: .utf8) {
-                        self?.readme = decodedReadme
+                        let down = Down(markdownString: decodedReadme)
+                        self.readme = try? down.toAttributedString(styler: self.markdownStyler)
                     } else {
-                        self?.readme = "Unable to decode README content."
+                        self.readme = NSAttributedString.init(string: "Unable to decode README content.")
                     }
                 case .failure(let error):
-                    self?.error = error
-                    self?.readme = "No README available for this repository."
+                    self.error = error
+                    self.readme = NSAttributedString.init(string: "No README available for this repository.")
                 }
             }
         }
     }
+    
+    lazy var markdownStyler: DownStyler = {
+
+        var paragraphStyle = StaticParagraphStyleCollection.init()
+        
+        let types = [paragraphStyle.body, paragraphStyle.heading1, paragraphStyle.heading2, paragraphStyle.heading3, paragraphStyle.heading4, paragraphStyle.heading5, paragraphStyle.heading6]
+        types.forEach { style in
+            (style as? NSMutableParagraphStyle)?.paragraphSpacing = 30
+            (style as? NSMutableParagraphStyle)?.lineSpacing = 20
+            (style as? NSMutableParagraphStyle)?.paragraphSpacingBefore = 30
+        }
+
+        let configuration = DownStylerConfiguration.init(paragraphStyles: paragraphStyle)
+
+        return DownStyler(configuration: configuration)
+    }()
 }
 
 struct ReadmeResponse: Codable {
@@ -84,3 +104,4 @@ struct ReadmeResponse: Codable {
         case encoding
     }
 } 
+

@@ -12,7 +12,7 @@
 		2E56BAD52DD5FE48008CB1C3 /* SwiftyJSON in Frameworks */ = {isa = PBXBuildFile; productRef = 2E56BAD42DD5FE48008CB1C3 /* SwiftyJSON */; };
 		2E56BAD82DD5FE60008CB1C3 /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 2E56BAD72DD5FE60008CB1C3 /* KeychainSwift */; };
 		2E56BADB2DD5FE8F008CB1C3 /* OAuthSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 2E56BADA2DD5FE8F008CB1C3 /* OAuthSwift */; };
-		2E56BAEA2DD62978008CB1C3 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 2E56BAE92DD62978008CB1C3 /* MarkdownUI */; };
+		2E63E33F2DD642B300E6889E /* Down in Frameworks */ = {isa = PBXBuildFile; productRef = 2E63E33E2DD642B300E6889E /* Down */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -76,8 +76,8 @@
 			files = (
 				2E56BAD22DD5FE25008CB1C3 /* Kingfisher in Frameworks */,
 				2E56BACD2DD5FDDD008CB1C3 /* Alamofire in Frameworks */,
+				2E63E33F2DD642B300E6889E /* Down in Frameworks */,
 				2E56BADB2DD5FE8F008CB1C3 /* OAuthSwift in Frameworks */,
-				2E56BAEA2DD62978008CB1C3 /* MarkdownUI in Frameworks */,
 				2E56BAD82DD5FE60008CB1C3 /* KeychainSwift in Frameworks */,
 				2E56BAD52DD5FE48008CB1C3 /* SwiftyJSON in Frameworks */,
 			);
@@ -145,7 +145,7 @@
 				2E56BAD42DD5FE48008CB1C3 /* SwiftyJSON */,
 				2E56BAD72DD5FE60008CB1C3 /* KeychainSwift */,
 				2E56BADA2DD5FE8F008CB1C3 /* OAuthSwift */,
-				2E56BAE92DD62978008CB1C3 /* MarkdownUI */,
+				2E63E33E2DD642B300E6889E /* Down */,
 			);
 			productName = GitHub;
 			productReference = 2E56BA6F2DD5F8E8008CB1C3 /* GitHub.app */;
@@ -235,7 +235,7 @@
 				2E56BAD32DD5FE48008CB1C3 /* XCRemoteSwiftPackageReference "SwiftyJSON" */,
 				2E56BAD62DD5FE60008CB1C3 /* XCRemoteSwiftPackageReference "keychain-swift" */,
 				2E56BAD92DD5FE8F008CB1C3 /* XCRemoteSwiftPackageReference "OAuthSwift" */,
-				2E56BAE82DD62978008CB1C3 /* XCRemoteSwiftPackageReference "MarkdownUI" */,
+				2E63E33D2DD642B300E6889E /* XCRemoteSwiftPackageReference "Down" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 2E56BA702DD5F8E8008CB1C3 /* Products */;
@@ -648,12 +648,12 @@
 				minimumVersion = 2.2.0;
 			};
 		};
-		2E56BAE82DD62978008CB1C3 /* XCRemoteSwiftPackageReference "MarkdownUI" */ = {
+		2E63E33D2DD642B300E6889E /* XCRemoteSwiftPackageReference "Down" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/gonzalezreal/MarkdownUI";
+			repositoryURL = "https://github.com/johnxnguyen/Down";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.4.1;
+				branch = master;
+				kind = branch;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -684,10 +684,10 @@
 			package = 2E56BAD92DD5FE8F008CB1C3 /* XCRemoteSwiftPackageReference "OAuthSwift" */;
 			productName = OAuthSwift;
 		};
-		2E56BAE92DD62978008CB1C3 /* MarkdownUI */ = {
+		2E63E33E2DD642B300E6889E /* Down */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 2E56BAE82DD62978008CB1C3 /* XCRemoteSwiftPackageReference "MarkdownUI" */;
-			productName = MarkdownUI;
+			package = 2E63E33D2DD642B300E6889E /* XCRemoteSwiftPackageReference "Down" */;
+			productName = Down;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

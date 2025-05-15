@@ -30,7 +30,9 @@ class HomeViewModel: ObservableObject {
         $selectedLanguage
             .dropFirst()
             .sink { [weak self] _ in
-                self?.fetchTrendingRepositories()
+                DispatchQueue.main.async {
+                    self?.fetchTrendingRepositories()
+                }
             }
             .store(in: &cancellables)
         

@@ -21,6 +21,9 @@ struct HomeView: View {
         ("year", "今年")
     ]
     
+    // 是否显示缓存控制选项
+    private let showCacheControl = false
+    
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
@@ -88,28 +91,30 @@ struct HomeView: View {
                 }
                 
                 // 缓存控制
-                HStack {
-                    Toggle("使用缓存", isOn: $viewModel.useCacheForRequests)
-                        .toggleStyle(SwitchToggleStyle(tint: .blue))
-                    
-                    Spacer()
-                    
-                    Button(action: {
-                        viewModel.clearAllCaches()
-                        viewModel.refreshRepositories()
-                    }) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "trash")
-                            Text("清除缓存")
-                                .font(.footnote)
+                if showCacheControl {
+                    HStack {
+                        Toggle("使用缓存", isOn: $viewModel.useCacheForRequests)
+                            .toggleStyle(SwitchToggleStyle(tint: .blue))
+                        
+                        Spacer()
+                        
+                        Button(action: {
+                            viewModel.clearAllCaches()
+                            viewModel.refreshRepositories()
+                        }) {
+                            HStack(spacing: 4) {
+                                Image(systemName: "trash")
+                                Text("清除缓存")
+                                    .font(.footnote)
+                            }
                         }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Color.gray.opacity(0.1))
+                        .cornerRadius(8)
                     }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(Color.gray.opacity(0.1))
-                    .cornerRadius(8)
+                    .padding(.horizontal)
                 }
-                .padding(.horizontal)
                 
                 // 仓库列表
                 if viewModel.isLoading {

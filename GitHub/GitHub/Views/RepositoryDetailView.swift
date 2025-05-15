@@ -7,6 +7,9 @@
 
 import SwiftUI
 import Kingfisher
+#if canImport(MarkdownUI)
+import MarkdownUI
+#endif
 
 struct RepositoryDetailView: View {
     @StateObject private var viewModel = RepositoryDetailViewModel()
@@ -136,12 +139,17 @@ struct RepositoryDetailView: View {
                             LoadingView(message: "加载README...")
                                 .frame(height: 200)
                         } else if let readme = viewModel.readme {
-                            Text(readme)
-                                .font(.body)
-                                .padding()
-                                .background(Color(.tertiarySystemBackground))
-                                .cornerRadius(10)
-                                .padding(.horizontal)
+                            if #available(iOS 15, *) {
+                                Markdown(readme)
+                                    .padding()
+                            } else {
+                                Text(readme)
+                                    .font(.body)
+                                    .padding()
+                                    .background(Color(.tertiarySystemBackground))
+                                    .cornerRadius(10)
+                                    .padding(.horizontal)
+                            }
                         } else {
                             Text("无法加载README或该仓库不包含README文件")
                                 .foregroundColor(.secondary)

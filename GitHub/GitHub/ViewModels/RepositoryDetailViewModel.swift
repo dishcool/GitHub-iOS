@@ -56,7 +56,7 @@ class RepositoryDetailViewModel: ObservableObject {
                 switch result {
                 case .success(let response):
                     // Decode base64 content
-                    if let data = Data(base64Encoded: response.content),
+                    if let data = Data(base64Encoded: response.content, options: .ignoreUnknownCharacters),
                        let decodedReadme = String(data: data, encoding: .utf8) {
                         self?.readme = decodedReadme
                     } else {

@@ -19,7 +19,6 @@ struct User: Identifiable, Codable {
     let followers: Int?
     let following: Int?
     let publicRepos: Int?
-    let createdAt: Date?
     
     enum CodingKeys: String, CodingKey {
         case id
@@ -32,8 +31,8 @@ struct User: Identifiable, Codable {
         case followers
         case following
         case publicRepos = "public_repos"
-        case createdAt = "created_at"
     }
+    
 }
 
 extension User {
@@ -48,8 +47,7 @@ extension User {
             location: "San Francisco, CA",
             followers: 10000,
             following: 0,
-            publicRepos: 300,
-            createdAt: Date()
+            publicRepos: 300
         )
     }
 } 

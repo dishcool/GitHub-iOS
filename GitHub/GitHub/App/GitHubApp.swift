@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import OAuthSwift
 
 @main
 struct GitHubApp: App {
@@ -15,6 +16,11 @@ struct GitHubApp: App {
         WindowGroup {
             MainTabView()
                 .environmentObject(authViewModel)
+                .onOpenURL { url in
+                    // 这里是 App 捕捉回调 URL 的地方
+                    OAuthSwift.handle(url: url)
+                }
         }
+        
     }
 } 

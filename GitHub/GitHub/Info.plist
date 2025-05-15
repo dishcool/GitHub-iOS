@@ -8,7 +8,7 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>com.dishcool.github</string>
+			<string>com.dishcool.oauth</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>github</string>

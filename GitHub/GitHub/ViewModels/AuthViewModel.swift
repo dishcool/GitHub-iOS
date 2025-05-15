@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import LocalAuthentication
+import KeychainSwift
 
 class AuthViewModel: ObservableObject {
     @Published var isAuthenticated: Bool = false
@@ -16,10 +17,15 @@ class AuthViewModel: ObservableObject {
     @Published var error: Error?
     
     private var authService: AuthenticationServiceProtocol
+    private let keychain = KeychainSwift()
+    private let tokenKey = "github_oauth_token"
     
     init(authService: AuthenticationServiceProtocol = AuthenticationService()) {
         self.authService = authService
-        checkAuthenticationStatus()
+    }
+    
+    func hasToken() -> Bool {
+        return keychain.get(tokenKey) != nil
     }
     
     func checkAuthenticationStatus() {

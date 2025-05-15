@@ -9,6 +9,7 @@ import SwiftUI
 
 struct LoginView: View {
     @EnvironmentObject private var authViewModel: AuthViewModel
+    @State private var hasToken: Bool = false
     
     var body: some View {
         VStack(spacing: 30) {
@@ -34,49 +35,45 @@ struct LoginView: View {
             
             // Login Buttons
             VStack(spacing: 20) {
-                Button(action: {
-                    authViewModel.login()
-                }) {
-                    HStack {
-                        Image(systemName: "person.fill")
-                            .foregroundColor(.white)
-                        
-                        Text("GitHub账号登录")
-                            .font(.headline)
-                            .foregroundColor(.white)
+                // 只有之前未登录过的用户会显示GitHub账号登录按钮
+                if !hasToken {
+                    Button(action: {
+                        authViewModel.login()
+                    }) {
+                        HStack {
+                            Image(systemName: "person.fill")
+                                .foregroundColor(.white)
+                            
+                            Text("GitHub账号登录")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.accentColor)
+                        .cornerRadius(10)
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.accentColor)
-                    .cornerRadius(10)
                 }
                 
-                Button(action: {
-                    authViewModel.authenticateWithBiometric()
-                }) {
-                    HStack {
-                        Image(systemName: "faceid")
-                            .foregroundColor(.accentColor)
-                        
-                        Text("Face ID / Touch ID登录")
-                            .font(.headline)
-                            .foregroundColor(.accentColor)
+                // 只有之前登录过的用户会显示生物识别登录按钮
+                if hasToken {
+                    Button(action: {
+                        authViewModel.authenticateWithBiometric()
+                    }) {
+                        HStack {
+                            Image(systemName: "faceid")
+                                .foregroundColor(.accentColor)
+                            
+                            Text("Face ID / Touch ID登录")
+                                .font(.headline)
+                                .foregroundColor(.accentColor)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.accentColor.opacity(0.1))
+                        .cornerRadius(10)
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.accentColor.opacity(0.1))
-                    .cornerRadius(10)
                 }
-                
-                // Continue without login
-                Button(action: {
-                    // 跳转到主标签视图，保持未登录状态
-                }) {
-                    Text("暂不登录")
-                        .font(.headline)
-                        .foregroundColor(.secondary)
-                }
-                .padding(.top, 10)
             }
             .padding(.horizontal, 30)
             .padding(.bottom, 50)
@@ -97,6 +94,10 @@ struct LoginView: View {
                 message: Text(authError.message),
                 dismissButton: .default(Text("确定"))
             )
+        }
+        .onAppear {
+            // 使用 AuthViewModel 的 hasToken 方法检查是否有之前的登录记录
+            self.hasToken = authViewModel.hasToken()
         }
     }
 }

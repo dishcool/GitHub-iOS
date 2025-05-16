@@ -98,6 +98,14 @@ struct LoginView: View {
         .onAppear {
             // 使用 AuthViewModel 的 hasToken 方法检查是否有之前的登录记录
             self.hasToken = authViewModel.hasToken()
+            
+            // 检查并重置可能的挂起加载状态
+            authViewModel.resetLoadingState()
+        }
+        .onDisappear {
+            // 当登录页面消失时，立即重置加载状态
+            // 这会处理用户点击登录按钮后通过手势返回或取消 OAuth 授权的情况
+            authViewModel.resetLoadingState()
         }
     }
 }

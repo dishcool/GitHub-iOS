@@ -19,6 +19,7 @@ class AuthViewModel: ObservableObject {
     private var authService: AuthenticationServiceProtocol
     private let keychain = KeychainSwift()
     private let tokenKey = "github_oauth_token"
+    private var loginStartTime: Date?
     
     init(authService: AuthenticationServiceProtocol = AuthenticationService()) {
         self.authService = authService
@@ -26,6 +27,14 @@ class AuthViewModel: ObservableObject {
     
     func hasToken() -> Bool {
         return keychain.get(tokenKey) != nil
+    }
+    
+    func resetLoadingState() {
+        // 直接重置加载状态
+        DispatchQueue.main.async {
+            self.isLoading = false
+            self.loginStartTime = nil
+        }
     }
     
     func checkAuthenticationStatus() {
@@ -48,9 +57,13 @@ class AuthViewModel: ObservableObject {
     
     func login() {
         isLoading = true
+        loginStartTime = Date()
+        
         authService.authenticate { [weak self] result in
             DispatchQueue.main.async {
                 self?.isLoading = false
+                self?.loginStartTime = nil
+                
                 switch result {
                 case .success(let user):
                     self?.isAuthenticated = true
@@ -107,6 +120,14 @@ class AuthViewModel: ObservableObject {
             }
         } else {
             self.error = error
+        }
+    }
+    
+    // 取消登录过程
+    func cancelLogin() {
+        DispatchQueue.main.async {
+            self.isLoading = false
+            self.loginStartTime = nil
         }
     }
 } 

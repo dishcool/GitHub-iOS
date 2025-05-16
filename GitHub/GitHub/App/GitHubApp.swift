@@ -20,7 +20,12 @@ struct GitHubApp: App {
                     // 这里是 App 捕捉回调 URL 的地方
                     OAuthSwift.handle(url: url)
                 }
+                .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+                    // 当应用重新激活时检查加载状态
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        authViewModel.resetLoadingState()
+                    }
+                }
         }
-        
     }
 } 

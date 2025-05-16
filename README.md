@@ -169,14 +169,30 @@
 
 ```
 GitHub-iOS/
-├── Models/                 # 数据模型
-├── Views/                  # UI视图
-│   ├── Main/               # 主要视图
-│   └── CustomComponents/   # 自定义UI组件
-├── ViewModels/             # 视图模型
-├── Services/               # 服务层
-│   └── Protocols/          # 服务协议
-└── Tests/                  # 测试相关
+├── Designs/                # 设计资源和图表
+│   └── diagram/            # 架构图表（Mermaid）
+├── GitHub/                 # 主项目目录
+│   ├── GitHub/             # 应用源代码
+│   │   ├── App/            # 应用入口和配置
+│   │   ├── Models/         # 数据模型（User, Repository, Issue, Label等）
+│   │   ├── Views/          # UI视图
+│   │   │   ├── CustomComponents/ # 自定义UI组件（LoadingIndicator, RepositoryCard, WebView等）
+│   │   │   ├── MainTabView.swift # 主标签视图
+│   │   │   ├── HomeView.swift    # 首页视图
+│   │   │   ├── RepositoryDetailView.swift # 仓库详情
+│   │   │   ├── IssuesListView.swift # Issues列表
+│   │   │   ├── IssueDetailView.swift # Issue详情
+│   │   │   ├── ProfileView.swift  # 个人资料
+│   │   │   ├── SearchView.swift   # 搜索视图
+│   │   │   └── LoginView.swift    # 登录视图
+│   │   ├── ViewModels/     # 视图模型（各功能对应的ViewModel）
+│   │   ├── Services/       # 服务层
+│   │   │   └── Protocols/  # 服务协议
+│   │   └── Assets.xcassets # 应用资源
+│   ├── GitHubTests/        # 单元测试
+│   └── GitHubUITests/      # UI测试
+├── Screenshots/            # 应用截图
+└── Tests/                  # 测试文档
 ```
 
 ## 测试

@@ -82,17 +82,6 @@ struct IssueDetailView: View {
                                 }
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                                
-                                Button(action: {
-                                    let url = URL(string: "https://github.com/\(owner)/\(repoName)/issues/\(issue.number)")!
-                                    UIApplication.shared.open(url)
-                                }) {
-                                    HStack {
-                                        Image(systemName: "safari")
-                                        Text("浏览器中打开")
-                                    }
-                                    .font(.caption)
-                                }
                             }
                         }
                         .padding(.horizontal)

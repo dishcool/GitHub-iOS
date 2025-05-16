@@ -140,24 +140,6 @@ struct RepositoryDetailView: View {
                             }
                         }
                         .padding(.top, 8)
-                        
-                        // 在浏览器中打开链接按钮
-                        Button(action: {
-                            if let url = URL(string: repository.htmlUrl) {
-                                UIApplication.shared.open(url)
-                            }
-                        }) {
-                            HStack {
-                                Image(systemName: "safari")
-                                Text("在浏览器中打开")
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
-                        }
-                        .padding(.top, 8)
                     }
                     .padding()
                     .background(Color(.secondarySystemBackground))

@@ -17,7 +17,8 @@ struct MainTabView: View {
             }
             .navigationViewStyle(StackNavigationViewStyle())
             .tabItem {
-                Label("Home", systemImage: "house")
+                Image(systemName: "house")
+                Text("Home")
             }
             
             NavigationView {
@@ -25,7 +26,8 @@ struct MainTabView: View {
             }
             .navigationViewStyle(StackNavigationViewStyle())
             .tabItem {
-                Label("Search", systemImage: "magnifyingglass")
+                Image(systemName: "magnifyingglass")
+                Text("Search")
             }
             
             NavigationView {
@@ -37,8 +39,8 @@ struct MainTabView: View {
             }
             .navigationViewStyle(StackNavigationViewStyle())
             .tabItem {
-                Label(authViewModel.isAuthenticated ? "Profile" : "Login", 
-                      systemImage: authViewModel.isAuthenticated ? "person" : "person.crop.circle.badge.plus")
+                Image(systemName: authViewModel.isAuthenticated ? "person" : "person.crop.circle.badge.plus")
+                Text(authViewModel.isAuthenticated ? "Profile" : "Login")
             }
         }
     }

@@ -7,7 +7,9 @@
 - **认证功能**：GitHub OAuth登录和生物识别（Face ID/Touch ID）登录
 - **内容浏览**：
   - 热门仓库展示（未登录也可访问）
-  - 仓库详情（包含基本信息、README显示、代码浏览和Issues查看）
+  - 仓库详情（包含基本信息、README显示）
+  - 代码浏览（支持在应用内查看仓库代码结构）
+  - Issues管理（原生实现，支持列表浏览、搜索、标签显示和详情查看）
   - 用户资料展示
 - **搜索功能**：支持搜索仓库、用户和组织
 - **界面与体验**：
@@ -32,6 +34,8 @@
 - 属性包装器: @Published, @StateObject, @ObservedObject
 - Swift并发: async/await
 - 基于协议的依赖注入
+- 自定义搜索和刷新实现
+- 原生Issues组件（支持标签渲染、日期格式化）
 
 ### 网络和数据
 
@@ -58,24 +62,34 @@
 <div align="center">
   <p>
     <img src="Designs/AppIcon.svg" width="150" alt="GitHub iOS应用图标"/>
+  </p>
+  <p><em>应用图标</em></p>
+  
+  <p>
     <img src="Screenshots/Login.png" width="250" alt="登录界面"/>
     <img src="Screenshots/Login-Bio.png" width="250" alt="生物识别登录"/>
+    <img src="Screenshots/Popular List.png" width="250" alt="热门仓库列表"/>
   </p>
-  <p><em>应用图标 | 登录界面 | 生物识别登录</em></p>
+  <p><em>登录界面 | 生物识别登录 | 热门仓库列表</em></p>
 
   <p>
-    <img src="Screenshots/Popular List.png" width="250" alt="热门仓库列表"/>
     <img src="Screenshots/Repository Details.png" width="250" alt="仓库详情"/>
     <img src="Screenshots/Profile.png" width="250" alt="个人资料"/>
+    <img src="Screenshots/Search Repo.png" width="250" alt="仓库搜索"/>
   </p>
-  <p><em>热门仓库列表 | 仓库详情 | 个人资料</em></p>
+  <p><em>仓库详情 | 个人资料 | 仓库搜索</em></p>
 
   <p>
-    <img src="Screenshots/Search Repo.png" width="250" alt="仓库搜索"/>
     <img src="Screenshots/Search User.png" width="250" alt="用户搜索"/>
     <img src="Screenshots/Error.png" width="250" alt="错误页面"/>
+    <img src="Screenshots/Issues List.png" width="250" alt="Issues列表"/>
   </p>
-  <p><em>仓库搜索 | 用户搜索 | 错误处理界面</em></p>
+  <p><em>用户搜索 | 错误处理界面 | Issues列表</em></p>
+
+  <p>
+    <img src="Screenshots/Issue Detail.png" width="250" alt="Issue详情"/>
+  </p>
+  <p><em>Issue详情</em></p>
 </div>
 
 ## 架构设计

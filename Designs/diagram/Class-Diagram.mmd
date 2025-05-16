@@ -57,6 +57,17 @@ classDiagram
         +fetchUserData()
         +fetchUserRepositories()
     }
+    
+    class IssuesViewModel {
+        <<ViewModel>>
+        -issuesService: IssuesServiceProtocol
+        +issues: [Issue]
+        +selectedIssue: Issue?
+        +isLoading: Bool
+        +errorMessage: String?
+        +loadIssues(owner, repo)
+        +loadIssueDetail(owner, repo, issueNumber)
+    }
 
     %% 服务接口
     class AuthenticationServiceProtocol {
@@ -87,6 +98,12 @@ classDiagram
         +searchUsers(query, page, perPage, useCache, completion)
         +getUserDetails(username, useCache, completion)
     }
+    
+    class IssuesServiceProtocol {
+        <<Protocol>>
+        +getIssues(owner, repo) async throws -> [Issue]
+        +getIssueDetail(owner, repo, issueNumber) async throws -> Issue
+    }
 
     %% 服务实现
     class AuthenticationService {
@@ -113,6 +130,12 @@ classDiagram
         +clearCache()
         +clearCache(for: endpoint)
     }
+    
+    class IssuesService {
+        -networkService: NetworkServiceProtocol
+        +getIssues(owner, repo) async throws -> [Issue]
+        +getIssueDetail(owner, repo, issueNumber) async throws -> Issue
+    }
 
     %% 数据模型
     class Repository {
@@ -137,6 +160,27 @@ classDiagram
         +followers: Int
         +following: Int
     }
+    
+    class Issue {
+        +id: Int
+        +number: Int
+        +title: String
+        +body: String?
+        +state: String
+        +createdAt: String
+        +updatedAt: String
+        +comments: Int
+        +user: User
+        +labels: [Label]?
+        +assignees: [User]?
+    }
+    
+    class Label {
+        +id: Int
+        +name: String
+        +color: String
+        +description: String?
+    }
 
     %% 视图
     class MainTabView {
@@ -148,6 +192,22 @@ classDiagram
     class LoginView {
         <<View>>
         +authViewModel: AuthViewModel
+    }
+    
+    class IssuesListView {
+        <<View>>
+        -viewModel: IssuesViewModel
+        -searchText: String
+        -owner: String
+        -repoName: String
+    }
+    
+    class IssueDetailView {
+        <<View>>
+        -viewModel: IssuesViewModel
+        -owner: String
+        -repoName: String
+        -issueNumber: Int
     }
 
     %% 关系
@@ -164,12 +224,21 @@ classDiagram
     SearchViewModel --> UserServiceProtocol
     ProfileViewModel --> UserServiceProtocol
     ProfileViewModel --> RepositoryServiceProtocol
+    IssuesViewModel --> IssuesServiceProtocol
 
     AuthenticationService ..|> AuthenticationServiceProtocol
     NetworkService ..|> NetworkServiceProtocol
+    IssuesService ..|> IssuesServiceProtocol
     
     AuthenticationService --> NetworkServiceProtocol
+    IssuesService --> NetworkServiceProtocol
+    
+    Issue --> User
+    Issue --> Label
+    
+    IssuesListView --> IssueDetailView
     
     AuthenticationService --> User
     NetworkService --> Repository
     NetworkService --> User 
+    NetworkService --> Issue 

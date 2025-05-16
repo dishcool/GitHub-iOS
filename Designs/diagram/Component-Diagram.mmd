@@ -1,42 +1,45 @@
 graph TD
-    subgraph UI Layer
+    subgraph UI_Layer[UI Layer]
         direction LR
         MainTabView["MainTabView (TabView)"]
         Views["Views (HomeView, ProfileView, etc.)"]
+        IssuesViews["Issues Views (IssuesListView, IssueDetailView)"]
         CustomComponents["Custom Components (RepositoryCard, LoadingIndicator, etc.)"]
     end
 
-    subgraph ViewModel Layer
+    subgraph ViewModel_Layer[ViewModel Layer]
         direction LR
         AuthViewModel["AuthViewModel"]
         HomeViewModel["HomeViewModel"]
         ProfileViewModel["ProfileViewModel"]
         SearchViewModel["SearchViewModel"]
         RepoDetailViewModel["RepositoryDetailViewModel"]
+        IssuesViewModel["IssuesViewModel"]
     end
 
-    subgraph Service Layer
+    subgraph Service_Layer[Service Layer]
         direction TB
-        Services["Services"]
-        subgraph Service Implementations
+        subgraph Service_Implementations[Service Implementations]
             direction LR
             AuthService["AuthenticationService"]
             NetworkService["NetworkService"]
             RepoService["RepositoryService"]
             UserService["UserService"]
+            IssuesService["IssuesService"]
         end
-        subgraph Service Protocols
+        subgraph Service_Protocols[Service Protocols]
             direction LR
             AuthServiceProtocol["AuthenticationServiceProtocol"]
             NetworkServiceProtocol["NetworkServiceProtocol"]
             RepoServiceProtocol["RepositoryServiceProtocol"]
             UserServiceProtocol["UserServiceProtocol"]
+            IssuesServiceProtocol["IssuesServiceProtocol"]
         end
     end
 
-    subgraph Data Layer
+    subgraph Data_Layer[Data Layer]
         direction LR
-        Models["Models (User, Repository, Organization)"]
+        Models["Models (User, Repository, Issue, Label)"]
         KeychainStorage["Keychain Storage"]
         Cache["In-Memory Cache"]
     end
@@ -48,30 +51,41 @@ graph TD
         BiometricAuth["Biometric Authentication"]
     end
 
+    %% 主要层级间的关系
     UI_Layer --> ViewModel_Layer
     ViewModel_Layer --> Service_Layer
     Service_Layer --> Data_Layer
     Service_Layer --> External
 
+    %% 服务实现与协议间的关系
     AuthService --> AuthServiceProtocol
     NetworkService --> NetworkServiceProtocol
     RepoService --> RepoServiceProtocol
     UserService --> UserServiceProtocol
+    IssuesService --> IssuesServiceProtocol
 
+    %% 服务依赖关系
     AuthService --> NetworkService
     RepoService --> NetworkService
     UserService --> NetworkService
+    IssuesService --> NetworkService
 
+    %% 数据存储关系
     AuthService --> KeychainStorage
     NetworkService --> Cache
 
+    %% UI组件关系
     MainTabView --> Views
     Views --> CustomComponents
+    Views --> IssuesViews
+    IssuesViews --> CustomComponents
 
+    %% ViewModel与Service连接关系
     AuthViewModel --> AuthService
     HomeViewModel --> RepoService
     ProfileViewModel --> UserService
     ProfileViewModel --> RepoService
     SearchViewModel --> RepoService
     SearchViewModel --> UserService
-    RepoDetailViewModel --> RepoService 
+    RepoDetailViewModel --> RepoService
+    IssuesViewModel --> IssuesService 

@@ -48,12 +48,15 @@ struct RepositoryDetailView: View {
                             Spacer()
                             
                             if repository.isPrivate {
-                                Label("私有", systemImage: "lock.fill")
-                                    .font(.caption)
-                                    .padding(5)
-                                    .background(Color.red.opacity(0.2))
-                                    .foregroundColor(.red)
-                                    .cornerRadius(5)
+                                HStack(spacing: 4) {
+                                    Image(systemName: "lock.fill")
+                                    Text("私有")
+                                }
+                                .font(.caption)
+                                .padding(5)
+                                .background(Color.red.opacity(0.2))
+                                .foregroundColor(.red)
+                                .cornerRadius(5)
                             }
                         }
                         
@@ -123,10 +126,7 @@ struct RepositoryDetailView: View {
                             }
                             
                             NavigationLink(
-                                destination: WebViewPage(
-                                    url: URL(string: "https://github.com/\(owner)/\(repoName)/issues")!,
-                                    title: "Issues列表"
-                                )
+                                destination: IssuesListView(owner: owner, repoName: repoName)
                             ) {
                                 HStack {
                                     Image(systemName: "exclamationmark.circle.fill")

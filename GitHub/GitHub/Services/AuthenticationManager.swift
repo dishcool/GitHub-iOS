@@ -31,7 +31,15 @@ class AuthenticationManager {
     
     /// Check current authentication state
     func checkAuthState() {
-        isAuthenticated = KeychainService.shared.hasToken()
+        // Only automatically set authenticated based on token in simulator
+        // On physical devices, require biometric authentication before setting authenticated
+        if EnvironmentUtility.isRunningOnSimulator {
+            isAuthenticated = KeychainService.shared.hasToken()
+        } else {
+            // On real devices, always start in non-authenticated state
+            // User will need to authenticate with biometrics first
+            isAuthenticated = false
+        }
     }
     
     /// Attempt to authenticate silently using stored token

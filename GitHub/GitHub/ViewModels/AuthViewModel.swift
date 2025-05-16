@@ -182,10 +182,12 @@ class AuthViewModel: ObservableObject {
     }
     
     func authenticateWithBiometric() {
+        print("[Auth] Attempting biometric authentication")
+        isLoading = true
+        
         // If in simulator environment with a token, try to login directly using the token without biometric auth
         if isRunningOnSimulator && hasToken() {
             print("[Auth] Detected simulator environment with saved token, skipping biometric authentication and trying to login directly")
-            isLoading = true
             
             authService.authenticateWithBiometric { [weak self] result in
                 DispatchQueue.main.async {
@@ -194,8 +196,10 @@ class AuthViewModel: ObservableObject {
                     case .success(let user):
                         self?.isAuthenticated = true
                         self?.currentUser = user
+                        print("[Auth] Simulator auth successful, user: \(user.login)")
                     case .failure(let error):
                         self?.error = error
+                        print("[Auth] Simulator auth failed: \(error.localizedDescription)")
                     }
                 }
             }
@@ -208,29 +212,47 @@ class AuthViewModel: ObservableObject {
         
         if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
             let reason = "Log in to your GitHub account"
+            print("[Auth] Starting biometric authentication on physical device")
             
             context.evaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, localizedReason: reason) { [weak self] success, error in
                 DispatchQueue.main.async {
                     if success {
+                        print("[Auth] Biometric authentication successful, proceeding to token check")
                         // Biometric auth succeeded - check keychain for stored credentials
                         self?.authService.authenticateWithBiometric { result in
                             DispatchQueue.main.async {
+                                self?.isLoading = false
                                 switch result {
                                 case .success(let user):
+                                    print("[Auth] Token authentication successful, user: \(user.login)")
                                     self?.isAuthenticated = true
                                     self?.currentUser = user
                                 case .failure(let error):
+                                    print("[Auth] Token authentication failed: \(error.localizedDescription)")
                                     self?.error = error
                                 }
                             }
                         }
                     } else if let error = error {
-                        self?.error = error
+                        print("[Auth] Biometric authentication failed: \(error.localizedDescription)")
+                        DispatchQueue.main.async {
+                            self?.isLoading = false
+                            self?.error = error
+                        }
+                    } else {
+                        print("[Auth] Biometric authentication cancelled by user")
+                        DispatchQueue.main.async {
+                            self?.isLoading = false
+                        }
                     }
                 }
             }
         } else {
-            self.error = error
+            print("[Auth] Biometric authentication not available: \(error?.localizedDescription ?? "Unknown error")")
+            DispatchQueue.main.async {
+                self.isLoading = false
+                self.error = error ?? NSError(domain: "AuthViewModel", code: -1, userInfo: [NSLocalizedDescriptionKey: "Biometric authentication not available"])
+            }
         }
     }
     

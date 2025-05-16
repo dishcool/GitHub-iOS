@@ -25,6 +25,14 @@
 4. **GitHubTests** - 基础模型测试
    - 测试 Repository 模型的基本属性
 
+## 测试结果
+
+所有单元测试均成功通过，测试结果截图如下：
+
+![单元测试结果](/Users/dishcool/workspace/GitHub/GitHub-iOS/Tests/UnitTest-result.png)
+
+> **注意**：测试结果截图保存在 `Tests/UnitTest-result.png` 文件中。如需查看最新测试结果，请运行测试套件并查看 Xcode 测试报告。
+
 ## 如何运行测试
 
 ### 使用 Xcode 运行测试

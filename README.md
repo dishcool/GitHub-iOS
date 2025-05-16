@@ -129,12 +129,29 @@
 
 ## 测试
 
-项目包含全面的单元测试套件，覆盖了核心功能和组件。详细的测试文档位于 [Tests/README.md](Tests/README.md)，包括：
+项目包含全面的测试套件，覆盖了核心功能和组件。所有测试均已成功通过，测试结果截图位于 `Tests` 目录下。
+
+### 单元测试
+
+详细的单元测试文档位于 [Tests/UNIT_TESTS.md](Tests/UNIT_TESTS.md)，包括：
 
 - 测试套件概述
+- 测试结果展示（[查看截图](Tests/UnitTest-result.png)）
 - 如何运行测试
 - 测试策略
 - 常见问题与解决方案
+
+### UI 测试
+
+详细的 UI 测试文档位于 [Tests/UI_TESTS.md](Tests/UI_TESTS.md)，包括：
+
+- UI 测试套件概述（所有 UI 测试已合并到 GitHubUITests.swift 中以提高代码复用性）
+- 测试结果展示（[查看截图](Tests/UITest-result.png)）
+- 如何运行 UI 测试
+- UI 测试策略和最佳实践
+- 常见问题与解决方案
+
+我们的 UI 测试采用了模块化和可复用的设计，通过共享辅助方法如 `findTabByName` 和 `waitForAnyElement` 来提高测试的稳定性和易维护性。测试报告中包含了自动捕获的屏幕截图，用于验证应用在不同状态下的 UI 表现。
 
 ## 开发团队
 

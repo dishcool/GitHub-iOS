@@ -10,17 +10,18 @@ import Alamofire
 import SwiftyJSON
 
 class NetworkService: NetworkServiceProtocol {
-    // You can set your GitHub Personal Access Token here
-    // If you don't have one, you can create it via https://github.com/settings/tokens
-    private let githubToken: String? = "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"
+    
+    // GitHub OAuth credentials for unauthenticated requests
+    private let clientID = "Ov23lijpUq87uT9pa2yD"
+    private let clientSecret = "26a8caee7663039413011fb35dde3daf9feedb29"
     
     private var defaultHeaders: [String: String] {
         var headers = [
             "Accept": "application/json"
         ]
         
-        // If there's an authentication token, add it to the request headers
-        if let token = githubToken, !token.isEmpty {
+        // Get token from KeychainService instead of hardcoded value
+        if let token = KeychainService.shared.retrieveToken(), !token.isEmpty {
             headers["Authorization"] = "token \(token)"
         }
         
@@ -87,81 +88,129 @@ class NetworkService: NetworkServiceProtocol {
             print("📦 Parameters: \(parameters)")
         }
         
+        // Determine if we're making an authenticated request
+        let isAuthenticated = allHeaders["Authorization"] != nil
+        
+        // For unauthenticated requests to GitHub API, add client_id and client_secret as parameters
+        var finalParameters = parameters ?? [:]
+        if !isAuthenticated && endpoint.contains("api.github.com") {
+            // Only add client credentials for GitHub API requests
+            var urlComponents = URLComponents(string: endpoint)
+            
+            // Add client_id and client_secret to URL for GET requests
+            if method == .get {
+                var queryItems = urlComponents?.queryItems ?? []
+                queryItems.append(URLQueryItem(name: "client_id", value: clientID))
+                queryItems.append(URLQueryItem(name: "client_secret", value: clientSecret))
+                urlComponents?.queryItems = queryItems
+                
+                if let newURL = urlComponents?.url {
+                    print("📝 Using client credentials for unauthenticated request")
+                    AF.request(
+                        newURL,
+                        method: alamofireMethod(from: method),
+                        parameters: finalParameters,
+                        encoding: URLEncoding.default,
+                        headers: HTTPHeaders(allHeaders)
+                    ).responseData { [weak self] response in
+                        self?.handleResponse(response: response, url: newURL, method: method, useCache: useCache, completion: completion)
+                    }
+                    return
+                }
+            } else {
+                // For non-GET requests, add client_id and client_secret to the parameters
+                finalParameters["client_id"] = clientID
+                finalParameters["client_secret"] = clientSecret
+                print("📝 Using client credentials for unauthenticated request")
+            }
+        }
+        
         let encoding: ParameterEncoding = method == .get ? URLEncoding.default : JSONEncoding.default
         
         AF.request(
             url,
             method: alamofireMethod(from: method),
-            parameters: parameters,
+            parameters: finalParameters,
             encoding: encoding,
             headers: HTTPHeaders(allHeaders)
-        ).responseData { response in
-            switch response.result {
-            case .success(let data):
-                // Log response details
-                let statusCode = response.response?.statusCode ?? 0
-                let rateLimitRemaining = response.response?.allHeaderFields["X-RateLimit-Remaining"] as? String ?? "Unknown"
-                let rateLimitReset = response.response?.allHeaderFields["X-RateLimit-Reset"] as? String ?? "Unknown"
-                
-                // Display remaining API request quota
-                print("[Network] Response: \(statusCode), Rate Limit Remaining: \(rateLimitRemaining), Reset: \(rateLimitReset)")
-                
-                if let string = String(data: data, encoding: .utf8) {
-                    print("📄 Response Data: \(string.prefix(500))...")
-                }
-                
-                if let statusCode = response.response?.statusCode {
-                    if statusCode >= 400 {
-                        do {
-                            let json = try JSON(data: data)
-                            if let message = json["message"].string {
-                                print("⚠️ API Error: \(message)")
-                                
-                                switch statusCode {
-                                case 401:
-                                    completion(.failure(NetworkError.unauthorized))
-                                    return
-                                case 403:
-                                    if message.contains("API rate limit exceeded") {
-                                        completion(.failure(NetworkError.rateLimitExceeded))
-                                    } else {
-                                        completion(.failure(NetworkError.serverError(statusCode: statusCode)))
-                                    }
-                                    return
-                                default:
-                                    completion(.failure(NetworkError.serverError(statusCode: statusCode)))
-                                    return
-                                }
-                            }
-                        } catch {
-                            print("❌ Error parsing JSON error response")
-                        }
-                    }
-                }
-                
-                do {
-                    let decodedObject = try JSONDecoder().decode(T.self, from: data)
-                    
-                    // Cache data for future use
-                    if let response = response.response, 
-                       200...299 ~= response.statusCode,
-                       method == .get {
-                        
-                        // For GET requests, cache the response
-                        self.cache.setObject(CacheEntry(data: data, timestamp: Date()), forKey: NSString(string: url.absoluteString))
-                        print("💾 Cached response for: \(endpoint)")
-                    }
-                    
-                    completion(.success(decodedObject))
-                } catch {
-                    print("❌ Decoding Error: \(error)")
-                    print("❌ Error data: \(String(data: data, encoding: .utf8) ?? "No data")")
-                    completion(.failure(NetworkError.decodingError))
-                }
-            case .failure(let error):
-                print("❌ Network Error: \(error.localizedDescription)")
-                completion(.failure(error))
+        ).responseData { [weak self] response in
+            self?.handleResponse(response: response, url: url, method: method, useCache: useCache, completion: completion)
+        }
+    }
+    
+    // Handle API response
+    private func handleResponse<T: Decodable>(
+        response: AFDataResponse<Data>,
+        url: URL,
+        method: HTTPMethod,
+        useCache: Bool,
+        completion: @escaping (Result<T, Error>) -> Void
+    ) {
+        switch response.result {
+        case .success(let data):
+            // Log response details
+            let statusCode = response.response?.statusCode ?? 0
+            let rateLimitRemaining = response.response?.allHeaderFields["X-RateLimit-Remaining"] as? String ?? "Unknown"
+            let rateLimitReset = response.response?.allHeaderFields["X-RateLimit-Reset"] as? String ?? "Unknown"
+            
+            // Display remaining API request quota
+            print("[Network] Response: \(statusCode), Rate Limit Remaining: \(rateLimitRemaining), Reset: \(rateLimitReset)")
+            
+            if let string = String(data: data, encoding: .utf8) {
+                print("📄 Response Data: \(string.prefix(500))...")
             }
+            
+            if let statusCode = response.response?.statusCode {
+                if statusCode >= 400 {
+                    do {
+                        let json = try JSON(data: data)
+                        if let message = json["message"].string {
+                            print("⚠️ API Error: \(message)")
+                            
+                            switch statusCode {
+                            case 401:
+                                completion(.failure(NetworkError.unauthorized))
+                                return
+                            case 403:
+                                if message.contains("API rate limit exceeded") {
+                                    completion(.failure(NetworkError.rateLimitExceeded))
+                                } else {
+                                    completion(.failure(NetworkError.serverError(statusCode: statusCode)))
+                                }
+                                return
+                            default:
+                                completion(.failure(NetworkError.serverError(statusCode: statusCode)))
+                                return
+                            }
+                        }
+                    } catch {
+                        print("❌ Error parsing JSON error response")
+                    }
+                }
+            }
+            
+            do {
+                let decodedObject = try JSONDecoder().decode(T.self, from: data)
+                
+                // Cache data for future use
+                if let response = response.response, 
+                   200...299 ~= response.statusCode,
+                   method == .get && useCache {
+                    
+                    // For GET requests, cache the response
+                    self.cache.setObject(CacheEntry(data: data, timestamp: Date()), forKey: NSString(string: url.absoluteString))
+                    print("💾 Cached response for: \(url)")
+                }
+                
+                completion(.success(decodedObject))
+            } catch {
+                print("❌ Decoding Error: \(error)")
+                print("❌ Error data: \(String(data: data, encoding: .utf8) ?? "No data")")
+                completion(.failure(NetworkError.decodingError))
+            }
+        case .failure(let error):
+            print("❌ Network Error: \(error.localizedDescription)")
+            completion(.failure(error))
         }
     }
     

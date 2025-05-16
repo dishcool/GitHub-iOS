@@ -8,7 +8,7 @@
 import Foundation
 
 /// Model representing a GitHub user
-struct User: Identifiable, Codable {
+struct User: Identifiable, Codable, Equatable {
     let id: Int
     let login: String
     let avatarUrl: String
@@ -33,6 +33,10 @@ struct User: Identifiable, Codable {
         case publicRepos = "public_repos"
     }
     
+    // Implement Equatable - two users are the same if they have the same id
+    static func == (lhs: User, rhs: User) -> Bool {
+        lhs.id == rhs.id
+    }
 }
 
 extension User {

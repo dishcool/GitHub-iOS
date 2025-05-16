@@ -17,8 +17,7 @@ class AuthViewModel: ObservableObject {
     @Published var error: Error?
     
     private var authService: AuthenticationServiceProtocol
-    private let keychain = KeychainSwift()
-    private let tokenKey = "github_oauth_token"
+    private let authManager: AuthenticationManager
     private var loginStartTime: Date?
     
     // Check if running in simulator environment
@@ -30,18 +29,23 @@ class AuthViewModel: ObservableObject {
         #endif
     }
     
-    init(authService: AuthenticationServiceProtocol = AuthenticationService()) {
+    init(authService: AuthenticationServiceProtocol = AuthenticationService(), 
+         authManager: AuthenticationManager = AuthenticationManager.shared) {
         self.authService = authService
+        self.authManager = authManager
+        
+        // Set initial authentication state from AuthManager
+        self.isAuthenticated = authManager.isAuthenticated
         
         // If in simulator environment and have a saved token, automatically check login status at startup
-        if isRunningOnSimulator && hasToken() {
+        if isRunningOnSimulator && KeychainService.shared.hasToken() {
             print("[Auth] Application launch, detected simulator environment with saved token, automatically checking login status")
             checkAuthenticationStatus()
         }
     }
     
     func hasToken() -> Bool {
-        return keychain.get(tokenKey) != nil
+        return KeychainService.shared.hasToken()
     }
     
     func resetLoadingState() {
@@ -74,17 +78,28 @@ class AuthViewModel: ObservableObject {
         isLoading = true
         loginStartTime = Date()
         
-        authService.authenticate { [weak self] result in
-            DispatchQueue.main.async {
-                self?.isLoading = false
-                self?.loginStartTime = nil
-                
-                switch result {
-                case .success(let user):
-                    self?.isAuthenticated = true
-                    self?.currentUser = user
-                case .failure(let error):
-                    self?.error = error
+        authManager.authenticate { [weak self] result in
+            guard let self = self else { return }
+            
+            // Keep the loading state active until we've fetched the user profile
+            // to avoid UI jumping between states
+            
+            switch result {
+            case .success:
+                // Set authenticated first but keep loading
+                self.isAuthenticated = true
+                // Fetch user profile before completing the loading state
+                self.fetchUserProfile { 
+                    DispatchQueue.main.async {
+                        self.isLoading = false
+                        self.loginStartTime = nil
+                    }
+                }
+            case .failure(let error):
+                DispatchQueue.main.async {
+                    self.isLoading = false
+                    self.loginStartTime = nil
+                    self.error = error
                 }
             }
         }
@@ -92,7 +107,7 @@ class AuthViewModel: ObservableObject {
     
     func logout() {
         isLoading = true
-        authService.logout { [weak self] result in
+        authManager.logout { [weak self] result in
             DispatchQueue.main.async {
                 self?.isLoading = false
                 switch result {
@@ -102,6 +117,43 @@ class AuthViewModel: ObservableObject {
                 case .failure(let error):
                     self?.error = error
                 }
+            }
+        }
+    }
+    
+    // Fetch current user profile with completion handler
+    private func fetchUserProfile(completion: @escaping () -> Void = {}) {
+        guard let token = KeychainService.shared.retrieveToken() else {
+            completion()
+            return
+        }
+        
+        let headers = ["Authorization": "token \(token)"]
+        let networkService = NetworkService()
+        
+        networkService.request(
+            endpoint: "https://api.github.com/user",
+            method: .get,
+            parameters: nil,
+            headers: headers,
+            useCache: true
+        ) { [weak self] (result: Result<User, Error>) in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let user):
+                    // Store currentUser first, then notify
+                    self?.currentUser = user
+                    self?.objectWillChange.send()
+                case .failure(let error):
+                    self?.error = error
+                    // If we can't get user data, invalidate authentication
+                    if let networkError = error as? NetworkError, 
+                       case .unauthorized = networkError {
+                        self?.isAuthenticated = false
+                        KeychainService.shared.deleteToken()
+                    }
+                }
+                completion()
             }
         }
     }

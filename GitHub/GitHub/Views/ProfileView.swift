@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Kingfisher
+import Combine
 
 struct ProfileView: View {
     @StateObject private var viewModel = ProfileViewModel()
@@ -174,11 +175,28 @@ struct ProfileView: View {
         }
         .navigationTitle(username != nil ? username! : "My Profile")
         .onAppear {
-            if let username = username {
-                viewModel.loadUserProfile(username: username)
-            } else if let currentUser = authViewModel.currentUser {
-                viewModel.user = currentUser
-                viewModel.loadUserRepositories(username: currentUser.login)
+            loadProfileData()
+        }
+        // Add observer for changes in authentication state
+        .onChange(of: authViewModel.isAuthenticated) { newValue in
+            if newValue {
+                // Only load if we don't already have user data
+                if viewModel.user == nil {
+                    // When user becomes authenticated, load profile data
+                    loadProfileData()
+                }
+            } else {
+                // When user logs out, clear the current user data
+                viewModel.user = nil
+                viewModel.repositories = []
+            }
+        }
+        // Use onReceive for currentUser changes
+        .onReceive(authViewModel.$currentUser.dropFirst().removeDuplicates()) { newUser in
+            if let user = newUser, viewModel.user?.id != user.id {
+                // Only update if the user is different to avoid unnecessary reloads
+                viewModel.user = user
+                viewModel.loadUserRepositories(username: user.login)
             }
         }
         .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
@@ -188,6 +206,26 @@ struct ProfileView: View {
                 refresh()
             }
             previousScrollOffset = value
+        }
+    }
+    
+    // Extract profile loading logic to a separate method
+    private func loadProfileData() {
+        // Avoid loading if we're already loading to prevent multiple parallel requests
+        guard !viewModel.isLoadingUser && !viewModel.isLoadingRepos else {
+            return
+        }
+        
+        if let username = username {
+            // If viewing someone else's profile
+            viewModel.loadUserProfile(username: username)
+        } else if let currentUser = authViewModel.currentUser {
+            // If viewing own profile and user data is available
+            viewModel.user = currentUser
+            viewModel.loadUserRepositories(username: currentUser.login)
+        } else if authViewModel.isAuthenticated {
+            // If authenticated but user data not yet loaded
+            authViewModel.checkAuthenticationStatus()
         }
     }
     

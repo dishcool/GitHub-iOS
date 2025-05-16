@@ -72,8 +72,8 @@ class AuthenticationService: AuthenticationServiceProtocol {
             state: state) { [weak self] result in
                 switch result {
                 case .success(let response):
-                    // Save token to keychain
-                    self?.keychain.set(response.credential.oauthToken, forKey: self?.tokenKey ?? "")
+                    // Save token to keychain using the shared KeychainService
+                    KeychainService.shared.storeToken(response.credential.oauthToken)
                     
                     // Fetch user data
                     self?.fetchUserProfile(token: response.credential.oauthToken, completion: completion)
@@ -86,14 +86,14 @@ class AuthenticationService: AuthenticationServiceProtocol {
     
     func authenticateWithBiometric(completion: @escaping (Result<User, Error>) -> Void) {
         // Check if running in simulator environment and has saved token
-        if isSimulator, let token = keychain.get(tokenKey) {
+        if isSimulator, let token = KeychainService.shared.retrieveToken() {
             print("[Auth] Detected simulator environment with saved token, automatically logging in with token")
             fetchUserProfile(token: token, completion: completion)
             return
         }
         
         // Real device environment or simulator without token, use normal biometric authentication flow
-        if let token = keychain.get(tokenKey) {
+        if let token = KeychainService.shared.retrieveToken() {
             fetchUserProfile(token: token, completion: completion)
         } else {
             completion(.failure(AuthenticationError.tokenNotFound))
@@ -101,19 +101,19 @@ class AuthenticationService: AuthenticationServiceProtocol {
     }
     
     func logout(completion: @escaping (Result<Void, Error>) -> Void) {
-        keychain.delete(tokenKey)
+        KeychainService.shared.deleteToken()
         completion(.success(()))
     }
     
     func checkToken(completion: @escaping (Result<User, Error>) -> Void) {
-        if let token = keychain.get(tokenKey) {
+        if let token = KeychainService.shared.retrieveToken() {
             fetchUserProfile(token: token) { result in
                 switch result {
                 case .success:
                     completion(result)
                 case .failure:
                     // If there's an error, delete the token
-                    self.keychain.delete(self.tokenKey)
+                    KeychainService.shared.deleteToken()
                     completion(result)
                 }
             }

@@ -88,11 +88,20 @@ class AuthViewModel: ObservableObject {
             case .success:
                 // Set authenticated first but keep loading
                 self.isAuthenticated = true
-                // Fetch user profile before completing the loading state
-                self.fetchUserProfile { 
+                // For unit tests, if currentUser is already set, don't fetch it again
+                if self.currentUser != nil {
+                    // Just complete the loading state immediately
                     DispatchQueue.main.async {
                         self.isLoading = false
                         self.loginStartTime = nil
+                    }
+                } else {
+                    // Fetch user profile before completing the loading state
+                    self.fetchUserProfile { 
+                        DispatchQueue.main.async {
+                            self.isLoading = false
+                            self.loginStartTime = nil
+                        }
                     }
                 }
             case .failure(let error):

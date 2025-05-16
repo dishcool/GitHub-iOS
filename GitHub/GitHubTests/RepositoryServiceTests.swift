@@ -27,8 +27,8 @@ final class RepositoryServiceTests: XCTestCase {
         // Given
         let expectation = XCTestExpectation(description: "Fetch trending repositories")
         let mockRepositories = [
-            Repository.placeholder,
-            Repository.placeholder
+            Repository.placeholder(),
+            Repository.placeholder()
         ]
         let mockResponse = SearchRepositoriesResponse(totalCount: mockRepositories.count, incompleteResults: false, items: mockRepositories)
         mockNetworkService.mockResult = MockNetworkService.MockResultType.success(mockResponse)
@@ -52,8 +52,8 @@ final class RepositoryServiceTests: XCTestCase {
         // Given
         let expectation = XCTestExpectation(description: "Search repositories")
         let mockRepositories = [
-            Repository.placeholder,
-            Repository.placeholder
+            Repository.placeholder(),
+            Repository.placeholder()
         ]
         let mockResponse = SearchRepositoriesResponse(totalCount: mockRepositories.count, incompleteResults: false, items: mockRepositories)
         mockNetworkService.mockResult = MockNetworkService.MockResultType.success(mockResponse)
@@ -76,7 +76,7 @@ final class RepositoryServiceTests: XCTestCase {
     func testGetRepositoryDetails() {
         // Given
         let expectation = XCTestExpectation(description: "Fetch repository details")
-        let mockRepository = Repository.placeholder
+        let mockRepository = Repository.placeholder()
         mockNetworkService.mockResult = MockNetworkService.MockResultType.success(mockRepository)
         
         // When
@@ -99,8 +99,8 @@ final class RepositoryServiceTests: XCTestCase {
         // Given
         let expectation = XCTestExpectation(description: "Fetch user repositories")
         let mockRepositories = [
-            Repository.placeholder,
-            Repository.placeholder
+            Repository.placeholder(),
+            Repository.placeholder()
         ]
         mockNetworkService.mockResult = MockNetworkService.MockResultType.success(mockRepositories)
         

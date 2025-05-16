@@ -20,11 +20,11 @@ final class GitHubTests: XCTestCase {
 
     func testRepositoryModelProperties() throws {
         // Test the basic properties of a Repository model
-        let repository = Repository.placeholder
+        let repository = Repository.placeholder()
         
         XCTAssertEqual(repository.id, 1)
-        XCTAssertEqual(repository.name, "swift")
-        XCTAssertEqual(repository.fullName, "apple/swift")
+        XCTAssertEqual(repository.name, "sample-repo-1")
+        XCTAssertEqual(repository.fullName, "user/sample-repo-1")
         XCTAssertEqual(repository.owner.login, "github")
         XCTAssertFalse(repository.isPrivate)
         XCTAssertTrue(repository.isInitialTestPassing)
@@ -39,7 +39,7 @@ final class GitHubTests: XCTestCase {
     
     // Test extension on Repository model
     func testRepositoryExtension() {
-        let repository = Repository.placeholder
+        let repository = Repository.placeholder()
         XCTAssertTrue(repository.isInitialTestPassing)
     }
 }

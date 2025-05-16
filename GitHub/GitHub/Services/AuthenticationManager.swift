@@ -21,8 +21,8 @@ class AuthenticationManager {
     /// Cancellables for Combine subscriptions
     private var cancellables = Set<AnyCancellable>()
     
-    /// Private initializer for singleton
-    private init(authService: AuthenticationServiceProtocol = AuthenticationService()) {
+    /// Protected initializer for allowing testing
+    init(authService: AuthenticationServiceProtocol = AuthenticationService()) {
         self.authService = authService
         
         // Set initial state based on token presence

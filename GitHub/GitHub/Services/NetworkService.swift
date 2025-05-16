@@ -9,12 +9,13 @@ import Foundation
 import Alamofire
 import SwiftyJSON
 
+/// Service for making network requests to the GitHub API
 class NetworkService: NetworkServiceProtocol {
-    
     // GitHub OAuth credentials for unauthenticated requests
     private let clientID = "Ov23lijpUq87uT9pa2yD"
     private let clientSecret = "26a8caee7663039413011fb35dde3daf9feedb29"
     
+    /// Default headers to include in all requests
     private var defaultHeaders: [String: String] {
         var headers = [
             "Accept": "application/json"
@@ -28,21 +29,31 @@ class NetworkService: NetworkServiceProtocol {
         return headers
     }
     
-    // Simple in-memory cache for caching GET request responses
-    private var cache = NSCache<NSString, CacheEntry>()
+    // Use our new cache implementation
+    private let cache: NetworkCacheProtocol
     
     // Cache time-to-live (seconds)
     private let cacheTTL: TimeInterval = 300 // 5 minutes
     
     private let session: Session
     
-    init(session: Session = .default) {
+    /// Initialize the network service
+    /// - Parameters:
+    ///   - session: Alamofire session for making requests
+    ///   - cache: Cache implementation to use
+    init(session: Session = .default, cache: NetworkCacheProtocol = InMemoryNetworkCache.shared) {
         self.session = session
-        
-        // Configure cache
-        cache.countLimit = 100 // Cache at most 100 requests
+        self.cache = cache
     }
     
+    /// Make a network request with full parameter control
+    /// - Parameters:
+    ///   - endpoint: The API endpoint URL
+    ///   - method: The HTTP method to use
+    ///   - parameters: Optional parameters to include in the request
+    ///   - headers: Optional headers to include in the request
+    ///   - useCache: Whether to use cached responses for GET requests
+    ///   - completion: Callback with the result containing the decoded response or an error
     func request<T: Decodable>(
         endpoint: String,
         method: HTTPMethod,
@@ -58,14 +69,14 @@ class NetworkService: NetworkServiceProtocol {
         
         // For GET requests, try to retrieve from cache
         if method == .get && useCache {
-            let cacheKey = NSString(string: endpoint + (parameters?.description ?? ""))
+            let cacheKey = "\(endpoint)_\(parameters?.description ?? "")"
             
-            if let cachedResponse = cache.object(forKey: cacheKey) {
+            if let cachedEntry = cache.retrieve(forKey: cacheKey) {
                 // Check if cache is expired
-                if Date().timeIntervalSince(cachedResponse.timestamp) < cacheTTL {
+                if Date().timeIntervalSince(cachedEntry.timestamp) < cacheTTL {
                     do {
                         // Try to decode from cache
-                        let decodedObject = try JSONDecoder().decode(T.self, from: cachedResponse.data)
+                        let decodedObject = try JSONDecoder().decode(T.self, from: cachedEntry.data)
                         print("🧩 Using cached response for: \(endpoint)")
                         completion(.success(decodedObject))
                         return
@@ -75,7 +86,8 @@ class NetworkService: NetworkServiceProtocol {
                     }
                 } else {
                     print("⏱️ Cache expired for: \(endpoint)")
-                    // Cache expired, continue with network request
+                    // Expired cache entry should be removed
+                    cache.remove(forKey: cacheKey)
                 }
             }
         }
@@ -113,7 +125,12 @@ class NetworkService: NetworkServiceProtocol {
                         encoding: URLEncoding.default,
                         headers: HTTPHeaders(allHeaders)
                     ).responseData { [weak self] response in
-                        self?.handleResponse(response: response, url: newURL, method: method, useCache: useCache, completion: completion)
+                        self?.handleResponse(response: response, 
+                                          url: newURL, 
+                                          method: method, 
+                                          cacheKey: "\(newURL.absoluteString)_\(finalParameters.description)", 
+                                          useCache: useCache, 
+                                          completion: completion)
                     }
                     return
                 }
@@ -134,15 +151,28 @@ class NetworkService: NetworkServiceProtocol {
             encoding: encoding,
             headers: HTTPHeaders(allHeaders)
         ).responseData { [weak self] response in
-            self?.handleResponse(response: response, url: url, method: method, useCache: useCache, completion: completion)
+            self?.handleResponse(response: response, 
+                              url: url, 
+                              method: method, 
+                              cacheKey: "\(url.absoluteString)_\(finalParameters.description)", 
+                              useCache: useCache, 
+                              completion: completion)
         }
     }
     
-    // Handle API response
+    /// Handle API response and perform caching if needed
+    /// - Parameters:
+    ///   - response: The response from the API
+    ///   - url: The request URL
+    ///   - method: The HTTP method used
+    ///   - cacheKey: Key to use for caching
+    ///   - useCache: Whether to cache the response
+    ///   - completion: Callback with the decoded result
     private func handleResponse<T: Decodable>(
         response: AFDataResponse<Data>,
         url: URL,
         method: HTTPMethod,
+        cacheKey: String,
         useCache: Bool,
         completion: @escaping (Result<T, Error>) -> Void
     ) {
@@ -198,8 +228,7 @@ class NetworkService: NetworkServiceProtocol {
                    method == .get && useCache {
                     
                     // For GET requests, cache the response
-                    self.cache.setObject(CacheEntry(data: data, timestamp: Date()), forKey: NSString(string: url.absoluteString))
-                    print("💾 Cached response for: \(url)")
+                    self.cache.store(data, forKey: cacheKey)
                 }
                 
                 completion(.success(decodedObject))
@@ -214,10 +243,18 @@ class NetworkService: NetworkServiceProtocol {
         }
     }
     
+    /// Convenience method for making simple network requests without parameters or headers
+    /// - Parameters:
+    ///   - endpoint: The API endpoint URL
+    ///   - method: The HTTP method to use
+    ///   - completion: Callback with the result containing the decoded response or an error
     func request<T: Decodable>(endpoint: String, method: HTTPMethod, completion: @escaping (Result<T, Error>) -> Void) {
         request(endpoint: endpoint, method: method, parameters: nil, headers: nil, completion: completion)
     }
     
+    /// Convert our HTTP method enum to Alamofire's HTTP method enum
+    /// - Parameter method: Our HTTP method
+    /// - Returns: Equivalent Alamofire HTTP method
     private func alamofireMethod(from method: HTTPMethod) -> Alamofire.HTTPMethod {
         switch method {
         case .get:
@@ -231,27 +268,23 @@ class NetworkService: NetworkServiceProtocol {
         }
     }
     
-    // Clear all caches
+    /// Clear all cached responses
     func clearCache() {
-        cache.removeAllObjects()
-        print("🧹 Cleared all cached responses")
+        cache.removeAll()
     }
     
-    // Clear cache for a specific endpoint
+    /// Clear cache for a specific endpoint
+    /// - Parameter endpoint: The endpoint URL to clear cache for
     func clearCache(for endpoint: String) {
-        let cacheKey = NSString(string: endpoint)
-        cache.removeObject(forKey: cacheKey)
+        // Find all keys that start with this endpoint
+        let key = endpoint
+        cache.remove(forKey: key)
         print("🧹 Cleared cached response for: \(endpoint)")
     }
-}
-
-/// Cache entry class for storing cached data and timestamps
-class CacheEntry {
-    let data: Data
-    let timestamp: Date
     
-    init(data: Data, timestamp: Date) {
-        self.data = data
-        self.timestamp = timestamp
+    /// Remove expired items from the cache
+    /// - Parameter maxAge: Maximum age in seconds for cached items
+    func removeExpiredCache(maxAge: TimeInterval = 300) {
+        cache.removeExpired(maxAge: maxAge)
     }
-} 
+}

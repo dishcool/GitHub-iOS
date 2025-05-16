@@ -43,7 +43,7 @@ extension XCUIDevice {
 final class GitHubUITests: XCTestCase {
 
     let app = XCUIApplication()
-    
+
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
 
@@ -76,7 +76,7 @@ final class GitHubUITests: XCTestCase {
         let loginButton = app.buttons.matching(NSPredicate(format: "label CONTAINS 'Login with GitHub Account' OR label CONTAINS 'Login with Face ID'")).firstMatch
         XCTAssertTrue(loginButton.exists, "Login button should exist")
     }
-    
+
     @MainActor
     func testNavigateToHomeWithoutLogin() throws {
         // Verify non-logged in users can access homepage
@@ -418,7 +418,7 @@ final class GitHubUITests: XCTestCase {
     }
     
     // MARK: - Performance Tests
-    
+
     @MainActor
     func testLaunchPerformance() throws {
         if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 7.0, *) {
@@ -469,9 +469,9 @@ final class GitHubUITests: XCTestCase {
         return nil
     }
     
-    /// Find tab by name
-    /// - Parameter names: Possible tab names array
-    /// - Returns: Found tab element, if not found returns nil
+    /// Find a tab by name from multiple possible names
+    /// - Parameter names: Array of possible tab names to look for
+    /// - Returns: The found tab element, or nil if not found
     func findTabByName(names: [String]) -> XCUIElement? {
         let tabBar = app.tabBars.firstMatch
         guard tabBar.exists else {
@@ -508,58 +508,58 @@ final class GitHubUITests: XCTestCase {
     }
     
     /// Navigate to login page
+    /// - Returns: True if navigation was successful and login screen elements were found
     func navigateToLoginScreen() -> Bool {
         // Print initial UI state
         print("Starting navigation to login screen")
         printUIHierarchy()
         
-        // 直接找到标签栏，然后点击第三个标签
-        // 从MainTabView的实现可以看到，第三个标签（索引2）是个人资料或登录标签
+        // Direct access to tab bar, then tap the third tab
+        // Based on MainTabView implementation, the third tab (index 2) is Profile/Login
         let tabBar = app.tabBars.firstMatch
         guard tabBar.exists else {
-            XCTFail("找不到标签栏")
+            XCTFail("Tab bar not found")
             return false
         }
         
         let tabButtons = tabBar.buttons.allElementsBoundByIndex
-        print("标签栏按钮: \(tabButtons.map { $0.label })")
+        print("Tab bar buttons: \(tabButtons.map { $0.label })")
         
-        // 确保标签栏至少有3个按钮
+        // Ensure tab bar has at least 3 buttons
         guard tabButtons.count >= 3 else {
-            XCTFail("标签栏按钮数量不足，找不到个人资料/登录标签")
+            XCTFail("Tab bar doesn't have enough buttons to find Profile/Login tab")
             return false
         }
         
-        // 点击第三个标签
+        // Tap the third tab
         let profileTab = tabButtons[2]
-        print("点击第三个标签: \(profileTab.label)")
+        print("Tapping third tab: \(profileTab.label)")
         profileTab.tap()
         
-        // 等待页面加载
+        // Wait for page to load
         sleep(2)
         
-        // 验证是否在登录页面
-        // 根据LoginView的实现，首先检查标题
-        // 注意：实际实现中标题是"Explore the world of GitHub"，而不是测试期望的"Explore the GitHub World"
+        // Verify we're on login page
+        // Based on LoginView implementation, check for title and subtitle
         let clientText = app.staticTexts["GitHub iOS Client"]
         let worldText = app.staticTexts["Explore the world of GitHub"]
         
         if clientText.exists && worldText.exists {
-            print("成功导航到登录页面 - 找到预期的标题")
+            print("Successfully navigated to login page - found expected titles")
             return true
         }
         
-        // 如果未找到预期的标题，检查是否有登录按钮
+        // If expected titles not found, check for login buttons
         let loginButtons = app.buttons.matching(NSPredicate(format: "label CONTAINS 'Login' OR label CONTAINS 'GitHub'")).allElementsBoundByIndex
         
         if !loginButtons.isEmpty {
-            print("找到登录按钮: \(loginButtons.map { $0.label })")
+            print("Found login buttons: \(loginButtons.map { $0.label })")
             return true
         }
         
-        // 打印当前页面所有元素，便于调试
-        print("当前页面上的文本: \(app.staticTexts.allElementsBoundByIndex.map { $0.label })")
-        print("当前页面上的按钮: \(app.buttons.allElementsBoundByIndex.map { $0.label })")
+        // Print current page elements for debugging
+        print("Text elements on page: \(app.staticTexts.allElementsBoundByIndex.map { $0.label })")
+        print("Button elements on page: \(app.buttons.allElementsBoundByIndex.map { $0.label })")
         
         return false
     }

@@ -11,14 +11,21 @@ import KeychainSwift
 import SafariServices
 import UIKit
 
+/// Errors specific to the authentication process
 enum AuthenticationError: Error {
+    /// No authentication token found in storage
     case tokenNotFound
+    /// Failed to complete the OAuth authorization flow
     case authorizationFailed
+    /// Network error during authentication
     case networkError
+    /// Biometric authentication is not available on this device
     case biometricNotAvailable
+    /// Unknown error during authentication
     case unknownError
 }
 
+/// Service handling authentication operations with GitHub
 class AuthenticationService: AuthenticationServiceProtocol {
     private let keychain = KeychainSwift()
     private let networkService: NetworkServiceProtocol
@@ -29,20 +36,19 @@ class AuthenticationService: AuthenticationServiceProtocol {
     
     private var oauthSwift: OAuth2Swift?
     
-    // Flag indicating if running in simulator environment
+    // Use the utility class instead of duplicating code
     private var isSimulator: Bool {
-        // Check if running in simulator environment
-        #if targetEnvironment(simulator)
-        return true  // Enable auto-login in simulator environment
-        #else
-        return false
-        #endif
+        return EnvironmentUtility.isRunningOnSimulator
     }
     
+    /// Initialize the authentication service
+    /// - Parameter networkService: Service for making network requests
     init(networkService: NetworkServiceProtocol = NetworkService()) {
         self.networkService = networkService
     }
     
+    /// Initiate the OAuth authentication flow with GitHub
+    /// - Parameter completion: Callback with the result containing the authenticated user or an error
     func authenticate(completion: @escaping (Result<User, Error>) -> Void) {
         oauthSwift = OAuth2Swift(
             consumerKey: clientID,
@@ -84,6 +90,8 @@ class AuthenticationService: AuthenticationServiceProtocol {
             }
     }
     
+    /// Authenticate using biometrics (or stored token on simulator)
+    /// - Parameter completion: Callback with the result containing the authenticated user or an error
     func authenticateWithBiometric(completion: @escaping (Result<User, Error>) -> Void) {
         // Check if running in simulator environment and has saved token
         if isSimulator, let token = KeychainService.shared.retrieveToken() {
@@ -100,11 +108,15 @@ class AuthenticationService: AuthenticationServiceProtocol {
         }
     }
     
+    /// Log out the current user by removing the stored token
+    /// - Parameter completion: Callback with the result of the logout operation
     func logout(completion: @escaping (Result<Void, Error>) -> Void) {
         KeychainService.shared.deleteToken()
         completion(.success(()))
     }
     
+    /// Check if the stored token is valid
+    /// - Parameter completion: Callback with the result containing the authenticated user or an error
     func checkToken(completion: @escaping (Result<User, Error>) -> Void) {
         if let token = KeychainService.shared.retrieveToken() {
             fetchUserProfile(token: token) { result in
@@ -122,6 +134,10 @@ class AuthenticationService: AuthenticationServiceProtocol {
         }
     }
     
+    /// Fetch the user profile using the provided token
+    /// - Parameters:
+    ///   - token: GitHub OAuth token
+    ///   - completion: Callback with the result containing the user profile or an error
     private func fetchUserProfile(token: String, completion: @escaping (Result<User, Error>) -> Void) {
         let headers = ["Authorization": "token \(token)"]
         
@@ -136,9 +152,11 @@ class AuthenticationService: AuthenticationServiceProtocol {
         }
     }
     
+    /// Generate a random state string for OAuth security
+    /// - Parameter length: Length of the random string to generate
+    /// - Returns: Random string of the specified length
     private func generateState(withLength length: Int) -> String {
         let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
         return String((0..<length).map { _ in letters.randomElement()! })
     }
-    
 } 

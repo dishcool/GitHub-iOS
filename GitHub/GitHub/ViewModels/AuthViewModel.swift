@@ -11,24 +11,31 @@ import LocalAuthentication
 import KeychainSwift
 
 class AuthViewModel: ObservableObject {
+    /// Indicates whether a user is currently authenticated
     @Published var isAuthenticated: Bool = false
+    
+    /// Current authenticated user info, or nil if not authenticated
     @Published var currentUser: User?
+    
+    /// Indicates whether an authentication operation is in progress
     @Published var isLoading: Bool = false
+    
+    /// Error that occurred during the last authentication operation, if any
     @Published var error: Error?
     
     private var authService: AuthenticationServiceProtocol
     private let authManager: AuthenticationManager
     private var loginStartTime: Date?
     
-    // Check if running in simulator environment
+    // Use the utility class instead of duplicating code
     private var isRunningOnSimulator: Bool {
-        #if targetEnvironment(simulator)
-            return true  // Enable auto-login functionality in simulator environment
-        #else
-            return false
-        #endif
+        return EnvironmentUtility.isRunningOnSimulator
     }
     
+    /// Initialize the view model
+    /// - Parameters:
+    ///   - authService: Service for handling authentication operations
+    ///   - authManager: Manager for handling authentication state
     init(authService: AuthenticationServiceProtocol = AuthenticationService(), 
          authManager: AuthenticationManager = AuthenticationManager.shared) {
         self.authService = authService
@@ -44,10 +51,14 @@ class AuthViewModel: ObservableObject {
         }
     }
     
+    /// Check if a token exists in the keychain
+    /// - Returns: True if a token exists
     func hasToken() -> Bool {
         return KeychainService.shared.hasToken()
     }
     
+    /// Reset the loading state to false
+    /// This is useful for recovering from interrupted authentication flows
     func resetLoadingState() {
         // Directly reset loading state
         DispatchQueue.main.async {
@@ -56,6 +67,7 @@ class AuthViewModel: ObservableObject {
         }
     }
     
+    /// Check the current authentication status by validating the stored token
     func checkAuthenticationStatus() {
         isLoading = true
         authService.checkToken { [weak self] result in
@@ -74,6 +86,7 @@ class AuthViewModel: ObservableObject {
         }
     }
     
+    /// Initiate the login process
     func login() {
         isLoading = true
         loginStartTime = Date()
@@ -114,6 +127,7 @@ class AuthViewModel: ObservableObject {
         }
     }
     
+    /// Log out the current user
     func logout() {
         isLoading = true
         authManager.logout { [weak self] result in

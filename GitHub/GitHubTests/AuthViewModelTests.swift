@@ -10,26 +10,38 @@ import Combine
 @testable import GitHub
 
 // Create a mock keychain service specifically for testing
-class MockKeychainService {
+class MockKeychainService: KeychainServiceProtocol {
+    /// Shared instance of the mock keychain service
     static let shared = MockKeychainService()
     
     // In-memory storage for testing
     private var tokenStorage: String?
     
+    /// Store a token in the in-memory storage
+    /// - Parameter token: The token to store
+    /// - Returns: True (always succeeds in the mock)
+    @discardableResult
     func storeToken(_ token: String) -> Bool {
         tokenStorage = token
         return true
     }
     
+    /// Retrieve the stored token from in-memory storage
+    /// - Returns: The stored token, or nil if not found
     func retrieveToken() -> String? {
         return tokenStorage
     }
     
+    /// Delete the stored token from in-memory storage
+    /// - Returns: True (always succeeds in the mock)
+    @discardableResult
     func deleteToken() -> Bool {
         tokenStorage = nil
         return true
     }
     
+    /// Check if a token exists in the in-memory storage
+    /// - Returns: True if a token exists
     func hasToken() -> Bool {
         return tokenStorage != nil
     }

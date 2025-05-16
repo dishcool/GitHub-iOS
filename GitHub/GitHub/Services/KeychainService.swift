@@ -9,7 +9,8 @@ import Foundation
 import KeychainSwift
 
 /// Service for securely storing and retrieving auth tokens
-class KeychainService {
+class KeychainService: KeychainServiceProtocol {
+    /// Shared instance of the keychain service
     static let shared = KeychainService()
     
     private let keychain = KeychainSwift()

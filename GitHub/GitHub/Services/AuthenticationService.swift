@@ -24,7 +24,7 @@ class AuthenticationService: AuthenticationServiceProtocol {
     private let networkService: NetworkServiceProtocol
     private let clientID = "Ov23lijpUq87uT9pa2yD" // GitHub OAuth client ID
     private let clientSecret = "26a8caee7663039413011fb35dde3daf9feedb29" // GitHub OAuth client secret
-    private let redirectURI = "github://callback" // This should match your GitHub OAuth app configuration
+    private let redirectURI = "github20250516junjian://callback" // This should match your GitHub OAuth app configuration
     private let tokenKey = "github_oauth_token"
     
     private var oauthSwift: OAuth2Swift?

@@ -124,13 +124,13 @@ struct WebViewPage: View {
     @State private var error: Error? = nil
     @State private var showRetryButton = false
     
-    // 获取底部安全区域高度
+    // Get the bottom safe area height
     private var bottomSafeAreaHeight: CGFloat {
         let window = UIApplication.shared.windows.first
         return window?.safeAreaInsets.bottom ?? 0
     }
     
-    // 底部标签栏高度（常量）
+    // Bottom tab bar height (constant)
     private let tabBarHeight: CGFloat = 49
     
     var body: some View {
@@ -138,7 +138,7 @@ struct WebViewPage: View {
             Color(.systemBackground)
                 .ignoresSafeArea()
             
-            // 创建一个包含WebView的容器，并添加底部填充
+            // Create a container with WebView and add bottom padding
             VStack(spacing: 0) {
                 WebView(url: url, isLoading: $isLoading, error: $error)
                     .onAppear {
@@ -151,26 +151,26 @@ struct WebViewPage: View {
                         }
                     }
                 
-                // 底部安全区域的背景填充
+                // Background fill for bottom safe area
                 Color(.systemBackground)
                     .frame(height: bottomSafeAreaHeight + tabBarHeight)
             }
             
             if isLoading {
-                // 绝对定位视图
+                // Absolutely positioned view
                 ZStack {
-                    // 半透明背景遮罩
+                    // Semi-transparent background mask
                     Rectangle()
                         .fill(Color(.systemBackground).opacity(0.95))
                         .ignoresSafeArea()
                     
-                    // 固定位置和尺寸的加载指示器容器
+                    // Loading indicator container with fixed position and size
                     VStack(spacing: 20) {
-                        // 使用固定尺寸的加载指示器
+                        // Use fixed size loading indicator
                         LoadingIndicator(size: 60)
                             .frame(width: 60, height: 60)
                         
-                        Text("正在加载页面...")
+                        Text("Loading page...")
                             .font(.headline)
                             .foregroundColor(.secondary)
                             .fixedSize(horizontal: true, vertical: true)
@@ -188,7 +188,7 @@ struct WebViewPage: View {
                                     self.error = nil
                                 }
                             }) {
-                                Text("重新加载")
+                                Text("Reload")
                                     .padding()
                                     .background(Color.blue)
                                     .foregroundColor(.white)
@@ -204,27 +204,27 @@ struct WebViewPage: View {
                             .fill(Color(.systemBackground))
                             .shadow(color: Color.black.opacity(0.1), radius: 10)
                     )
-                    .offset(y: -40) // 向上偏移，避免被底部标签栏遮挡
+                    .offset(y: -40) // Offset upward to avoid being covered by bottom tab bar
                 }
                 .edgesIgnoringSafeArea(.all)
             }
             
             if let error = error {
-                // 使用绝对定位的错误视图
+                // Error view with absolute positioning
                 ZStack {
-                    // 半透明背景遮罩
+                    // Semi-transparent background mask
                     Rectangle()
                         .fill(Color(.systemBackground).opacity(0.95))
                         .ignoresSafeArea()
                     
-                    // 固定尺寸和位置的错误提示容器
+                    // Error message container with fixed size and position
                     VStack(spacing: 20) {
                         Image(systemName: "exclamationmark.icloud.fill")
                             .font(.system(size: 50))
                             .foregroundColor(.red)
                             .frame(width: 60, height: 60)
                         
-                        Text("加载失败")
+                        Text("Loading Failed")
                             .font(.title2)
                             .fontWeight(.bold)
                             .fixedSize(horizontal: true, vertical: true)
@@ -245,7 +245,7 @@ struct WebViewPage: View {
                         }) {
                             HStack {
                                 Image(systemName: "arrow.clockwise")
-                                Text("重试")
+                                Text("Retry")
                             }
                             .padding()
                             .background(Color.blue)
@@ -260,7 +260,7 @@ struct WebViewPage: View {
                         }) {
                             HStack {
                                 Image(systemName: "safari")
-                                Text("在浏览器中打开")
+                                Text("Open in Browser")
                             }
                             .padding()
                             .background(Color.green)
@@ -277,7 +277,7 @@ struct WebViewPage: View {
                             .shadow(color: Color.black.opacity(0.1), radius: 10)
                     )
                     .frame(maxWidth: 350)
-                    .offset(y: -40) // 向上偏移，避免被底部标签栏遮挡
+                    .offset(y: -40) // Offset upward to avoid being covered by bottom tab bar
                 }
                 .edgesIgnoringSafeArea(.all)
             }

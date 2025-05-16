@@ -19,14 +19,14 @@ struct IssueDetailView: View {
         ScrollView {
             ZStack {
                 if viewModel.isLoading {
-                    LoadingView(message: "正在加载Issue详情...")
+                    LoadingView(message: "Loading issue details...")
                 } else if let errorMessage = viewModel.errorMessage {
                     ErrorView(message: errorMessage) {
                         viewModel.loadIssueDetail(owner: owner, repo: repoName, issueNumber: issueNumber)
                     }
                 } else if let issue = viewModel.selectedIssue {
                     VStack(alignment: .leading, spacing: 16) {
-                        // Issue标题和状态
+                        // Issue title and status
                         HStack(alignment: .center, spacing: 12) {
                             issueStatusBadge(state: issue.state)
                             
@@ -43,7 +43,7 @@ struct IssueDetailView: View {
                         
                         Divider()
                         
-                        // 创建者和时间信息
+                        // Creator and time information
                         HStack {
                             VStack(alignment: .leading, spacing: 4) {
                                 HStack {
@@ -62,12 +62,12 @@ struct IssueDetailView: View {
                                         .fontWeight(.medium)
                                 }
                                 
-                                Text("创建于 \(formatDate(issue.createdAt))")
+                                Text("Created on \(formatDate(issue.createdAt))")
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                                 
                                 if issue.createdAt != issue.updatedAt {
-                                    Text("更新于 \(formatDate(issue.updatedAt))")
+                                    Text("Updated on \(formatDate(issue.updatedAt))")
                                         .font(.caption)
                                         .foregroundColor(.secondary)
                                 }
@@ -78,7 +78,7 @@ struct IssueDetailView: View {
                             VStack(alignment: .trailing) {
                                 HStack {
                                     Image(systemName: "message")
-                                    Text("\(issue.comments) 条评论")
+                                    Text("\(issue.comments) comments")
                                 }
                                 .font(.caption)
                                 .foregroundColor(.secondary)
@@ -86,7 +86,7 @@ struct IssueDetailView: View {
                         }
                         .padding(.horizontal)
                         
-                        // 标签列表
+                        // Labels list
                         if let labels = issue.labels, !labels.isEmpty {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack {
@@ -100,7 +100,7 @@ struct IssueDetailView: View {
                         
                         Divider()
                         
-                        // Issue内容
+                        // Issue content
                         if let body = issue.body, !body.isEmpty {
                             VStack(alignment: .leading) {
                                 Text(body)
@@ -109,7 +109,7 @@ struct IssueDetailView: View {
                                     .padding(.horizontal)
                             }
                         } else {
-                            Text("没有描述内容")
+                            Text("No description content")
                                 .font(.body)
                                 .foregroundColor(.secondary)
                                 .padding()
@@ -122,7 +122,7 @@ struct IssueDetailView: View {
             }
             .frame(maxWidth: .infinity)
         }
-        .navigationTitle("Issue详情")
+        .navigationTitle("Issue Details")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             viewModel.loadIssueDetail(owner: owner, repo: repoName, issueNumber: issueNumber)
@@ -135,7 +135,7 @@ struct IssueDetailView: View {
                 .fill(state == "open" ? Color.green : Color.purple)
                 .frame(width: 10, height: 10)
             
-            Text(state == "open" ? "开放中" : "已关闭")
+            Text(state == "open" ? "Open" : "Closed")
                 .font(.caption)
                 .fontWeight(.medium)
         }

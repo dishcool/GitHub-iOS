@@ -19,10 +19,10 @@ struct RepositoryDetailView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
                 if viewModel.isLoading {
-                    LoadingView(message: "加载仓库信息...")
+                    LoadingView(message: "Loading repository information...")
                         .frame(height: 300)
                 } else if let repository = viewModel.repository {
-                    // 仓库基本信息
+                    // Repository basic information
                     VStack(alignment: .leading, spacing: 12) {
                         HStack {
                             KFImage(URL(string: repository.owner.avatarUrl))
@@ -50,7 +50,7 @@ struct RepositoryDetailView: View {
                             if repository.isPrivate {
                                 HStack(spacing: 4) {
                                     Image(systemName: "lock.fill")
-                                    Text("私有")
+                                    Text("Private")
                                 }
                                 .font(.caption)
                                 .padding(5)
@@ -70,16 +70,16 @@ struct RepositoryDetailView: View {
                         Divider()
                             .padding(.vertical, 8)
                         
-                        // 仓库统计信息
+                        // Repository statistics
                         HStack(spacing: 20) {
-                            Stat(count: repository.stargazersCount, name: "星标", icon: "star.fill", color: .yellow)
-                            Stat(count: repository.forksCount, name: "分叉", icon: "tuningfork", color: .gray)
-                            Stat(count: repository.watchersCount, name: "观察", icon: "eye.fill", color: .blue)
-                            Stat(count: repository.openIssuesCount, name: "问题", icon: "exclamationmark.circle.fill", color: .red)
+                            Stat(count: repository.stargazersCount, name: "Stars", icon: "star.fill", color: .yellow)
+                            Stat(count: repository.forksCount, name: "Forks", icon: "tuningfork", color: .gray)
+                            Stat(count: repository.watchersCount, name: "Watchers", icon: "eye.fill", color: .blue)
+                            Stat(count: repository.openIssuesCount, name: "Issues", icon: "exclamationmark.circle.fill", color: .red)
                         }
                         .padding(.vertical, 8)
                         
-                        // 仓库其他信息
+                        // Repository additional information
                         VStack(alignment: .leading, spacing: 8) {
                             if let language = repository.language {
                                 HStack {
@@ -94,29 +94,29 @@ struct RepositoryDetailView: View {
                             HStack {
                                 Image(systemName: "calendar")
                                     .foregroundColor(.gray)
-                                Text("创建于 \(formattedDate(repository.createdAt))")
+                                Text("Created on \(formattedDate(repository.createdAt))")
                                     .font(.subheadline)
                             }
                             
                             HStack {
                                 Image(systemName: "arrow.clockwise")
                                     .foregroundColor(.gray)
-                                Text("最后更新于 \(formattedDate(repository.updatedAt))")
+                                Text("Last updated on \(formattedDate(repository.updatedAt))")
                                     .font(.subheadline)
                             }
                         }
                         
-                        // 添加查看代码和Issues的按钮
+                        // Add buttons for viewing code and issues
                         HStack(spacing: 12) {
                             NavigationLink(
                                 destination: WebViewPage(
                                     url: URL(string: "https://github.com/\(owner)/\(repoName)")!,
-                                    title: "代码目录"
+                                    title: "Code Directory"
                                 )
                             ) {
                                 HStack {
                                     Image(systemName: "doc.text.fill")
-                                    Text("查看代码")
+                                    Text("View Code")
                                 }
                                 .frame(maxWidth: .infinity)
                                 .padding()
@@ -130,7 +130,7 @@ struct RepositoryDetailView: View {
                             ) {
                                 HStack {
                                     Image(systemName: "exclamationmark.circle.fill")
-                                    Text("查看Issues")
+                                    Text("View Issues")
                                 }
                                 .frame(maxWidth: .infinity)
                                 .padding()
@@ -154,7 +154,7 @@ struct RepositoryDetailView: View {
                             .padding(.horizontal)
                         
                         if viewModel.isLoadingReadme {
-                            LoadingView(message: "加载README...")
+                            LoadingView(message: "Loading README...")
                                 .frame(height: 200)
                         } else if let readme = viewModel.readme {
                             if #available(iOS 15, *) {
@@ -165,14 +165,14 @@ struct RepositoryDetailView: View {
                                     .padding()
                             }
                         } else {
-                            Text("无法加载README或该仓库不包含README文件")
+                            Text("Failed to load README or this repository doesn't contain a README file")
                                 .foregroundColor(.secondary)
                                 .padding()
                                 .frame(maxWidth: .infinity, alignment: .center)
                         }
                     }
                 } else if let error = viewModel.error {
-                    Text("加载失败: \(error.localizedDescription)")
+                    Text("Loading failed: \(error.localizedDescription)")
                         .foregroundColor(.red)
                         .padding()
                 }

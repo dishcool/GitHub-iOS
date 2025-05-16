@@ -29,7 +29,7 @@ This project contains the following major test suites:
 
 All unit tests have passed successfully, test results screenshot below:
 
-![Unit Test Results](/Users/dishcool/workspace/GitHub/GitHub-iOS/Tests/UnitTest-result.png)
+![Unit Test Results](./UnitTest-result.png)
 
 > **Note**: Test results screenshot is saved in the `Tests/UnitTest-result.png` file. To view the latest test results, please run the test suite and check the Xcode test report.
 

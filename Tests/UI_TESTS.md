@@ -21,7 +21,7 @@ This project contains the following main UI test suites:
 
 All UI tests have passed successfully, test results screenshot below:
 
-![UI Test Results](/Users/dishcool/workspace/GitHub/GitHub-iOS/Tests/UITest-result.png)
+![UI Test Results](./UITest-result.png)
 
 > **Note**: Test results screenshots are saved in the `Tests/UITest-result.png` file. To view the latest test results, please run the test suite and check the Xcode test report. The test report also includes screenshots automatically captured by each test, which can help analyze and verify UI behavior.
 

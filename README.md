@@ -15,6 +15,19 @@
 - **中文本地化**：使用Localization文件实现中文界面
 - **适配多种屏幕**：支持iPhone和iPad的各种屏幕尺寸
 
+## 应用图标
+
+<div align="center">
+  <img src="Designs/AppIcon.svg" width="200" alt="GitHub iOS应用图标"/>
+</div>
+<p align="center">
+  <em>GitHub iOS应用图标 - 简洁的GitHub猫（Octocat）设计</em>
+</p>
+
+应用图标采用简约设计，以GitHub的品牌标识（Octocat）为核心元素，搭配现代化的深色渐变背景，符合iOS图标设计规范。矢量格式的图标位于`Designs`文件夹中，支持高分辨率显示。
+
+详细的图标使用说明请参阅[AppIcon使用说明](Designs/AppIcon使用说明.md)文档。
+
 ## 应用截图
 
 <div align="center">

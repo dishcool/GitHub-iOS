@@ -1,0 +1,175 @@
+classDiagram
+    direction LR
+
+    %% 应用入口
+    class GitHubApp {
+        <<App>>
+        +authViewModel: AuthViewModel
+        +body: Scene
+    }
+
+    %% 视图模型
+    class AuthViewModel {
+        <<ViewModel>>
+        -authService: AuthenticationServiceProtocol
+        -keychain: KeychainSwift
+        +isAuthenticated: Bool
+        +currentUser: User?
+        +isLoading: Bool
+        +error: Error?
+        +login()
+        +logout()
+        +authenticateWithBiometric()
+        +checkAuthenticationStatus()
+    }
+
+    class HomeViewModel {
+        <<ViewModel>>
+        -repositoryService: RepositoryServiceProtocol
+        +repositories: [Repository]
+        +isLoading: Bool
+        +errorMessage: String?
+        +selectedLanguage: String
+        +selectedTimeSpan: String
+        +fetchTrendingRepositories()
+        +refreshRepositories()
+    }
+
+    class SearchViewModel {
+        <<ViewModel>>
+        -repositoryService: RepositoryServiceProtocol
+        -userService: UserServiceProtocol
+        +searchResults: [SearchResult]
+        +isLoading: Bool
+        +errorMessage: String?
+        +searchTerm: String
+        +searchType: SearchType
+        +performSearch()
+    }
+
+    class ProfileViewModel {
+        <<ViewModel>>
+        -userService: UserServiceProtocol
+        -repositoryService: RepositoryServiceProtocol
+        +userRepositories: [Repository]
+        +isLoading: Bool
+        +errorMessage: String?
+        +fetchUserData()
+        +fetchUserRepositories()
+    }
+
+    %% 服务接口
+    class AuthenticationServiceProtocol {
+        <<Protocol>>
+        +authenticate(completion)
+        +authenticateWithBiometric(completion)
+        +logout(completion)
+        +checkToken(completion)
+    }
+
+    class NetworkServiceProtocol {
+        <<Protocol>>
+        +request(endpoint, method, parameters, headers, useCache, completion)
+        +clearCache()
+        +clearCache(for: endpoint)
+    }
+
+    class RepositoryServiceProtocol {
+        <<Protocol>>
+        +getTrendingRepositories(language, timeSpan, useCache, completion)
+        +getRepositoriesForUser(username, page, perPage, useCache, completion)
+        +getRepositoryDetails(owner, name, useCache, completion)
+        +searchRepositories(query, page, perPage, useCache, completion)
+    }
+
+    class UserServiceProtocol {
+        <<Protocol>>
+        +searchUsers(query, page, perPage, useCache, completion)
+        +getUserDetails(username, useCache, completion)
+    }
+
+    %% 服务实现
+    class AuthenticationService {
+        -keychain: KeychainSwift
+        -networkService: NetworkServiceProtocol
+        -oauthSwift: OAuth2Swift?
+        -clientID: String
+        -clientSecret: String
+        -redirectURI: String
+        -tokenKey: String
+        +authenticate(completion)
+        +authenticateWithBiometric(completion)
+        +logout(completion)
+        +checkToken(completion)
+    }
+
+    class NetworkService {
+        -githubToken: String?
+        -defaultHeaders: [String: String]
+        -cache: NSCache
+        -cacheTTL: TimeInterval
+        -session: Session
+        +request(endpoint, method, parameters, headers, useCache, completion)
+        +clearCache()
+        +clearCache(for: endpoint)
+    }
+
+    %% 数据模型
+    class Repository {
+        +id: Int
+        +name: String
+        +fullName: String
+        +owner: User
+        +description: String?
+        +language: String?
+        +stargazersCount: Int
+        +forksCount: Int
+        +htmlUrl: String
+    }
+
+    class User {
+        +id: Int
+        +login: String
+        +avatarUrl: String
+        +name: String?
+        +bio: String?
+        +publicRepos: Int
+        +followers: Int
+        +following: Int
+    }
+
+    %% 视图
+    class MainTabView {
+        <<View>>
+        -authViewModel: AuthViewModel
+        -searchViewModel: SearchViewModel
+    }
+
+    class LoginView {
+        <<View>>
+        +authViewModel: AuthViewModel
+    }
+
+    %% 关系
+    GitHubApp *-- AuthViewModel
+    GitHubApp *-- MainTabView
+
+    MainTabView *-- HomeViewModel
+    MainTabView *-- SearchViewModel
+    MainTabView *-- ProfileViewModel
+
+    AuthViewModel --> AuthenticationServiceProtocol
+    HomeViewModel --> RepositoryServiceProtocol
+    SearchViewModel --> RepositoryServiceProtocol
+    SearchViewModel --> UserServiceProtocol
+    ProfileViewModel --> UserServiceProtocol
+    ProfileViewModel --> RepositoryServiceProtocol
+
+    AuthenticationService ..|> AuthenticationServiceProtocol
+    NetworkService ..|> NetworkServiceProtocol
+    
+    AuthenticationService --> NetworkServiceProtocol
+    
+    AuthenticationService --> User
+    NetworkService --> Repository
+    NetworkService --> User 

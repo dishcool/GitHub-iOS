@@ -1,0 +1,167 @@
+sequenceDiagram
+    autonumber
+    
+    %% 参与对象
+    actor User as 用户
+    participant LoginView as 登录视图
+    participant AuthViewModel as 认证视图模型
+    participant AuthService as 认证服务
+    participant SafariVC as Safari视图控制器
+    participant GitHubAPI as GitHub API
+    participant Keychain as 钥匙串
+    participant LAContext as 生物识别API
+    
+    %% 标题
+    Note over User,Keychain: GitHub iOS 登录流程
+    
+    %% ------ OAuth登录流程 ------
+    rect rgb(230, 240, 255)
+    Note right of User: OAuth登录流程
+    
+    User->>LoginView: 点击"GitHub账号登录"按钮
+    
+    LoginView->>AuthViewModel: login()
+    activate AuthViewModel
+    AuthViewModel->>AuthViewModel: isLoading = true
+    
+    AuthViewModel->>AuthService: authenticate(completion)
+    activate AuthService
+    
+    AuthService->>AuthService: 创建OAuth2Swift实例
+    AuthService->>SafariVC: 打开GitHub授权页面
+    deactivate AuthService
+    
+    Note over SafariVC,GitHubAPI: 用户在Safari中完成GitHub授权
+    
+    SafariVC-->>GitHubApp: 回调URL (github://callback?code=xxx)
+    
+    GitHubApp->>AuthService: OAuthSwift.handle(url)
+    activate AuthService
+    
+    AuthService->>GitHubAPI: 使用授权码交换访问令牌
+    activate GitHubAPI
+    GitHubAPI-->>AuthService: 返回访问令牌
+    deactivate GitHubAPI
+    
+    AuthService->>Keychain: 保存令牌
+    
+    AuthService->>GitHubAPI: 使用令牌获取用户信息
+    activate GitHubAPI
+    GitHubAPI-->>AuthService: 返回用户数据
+    deactivate GitHubAPI
+    
+    AuthService-->>AuthViewModel: 返回结果(成功: User / 失败: Error)
+    deactivate AuthService
+    
+    alt 登录成功
+        AuthViewModel->>AuthViewModel: isAuthenticated = true, currentUser = user
+    else 登录失败
+        AuthViewModel->>AuthViewModel: error = error
+    end
+    
+    AuthViewModel->>AuthViewModel: isLoading = false
+    deactivate AuthViewModel
+    
+    LoginView-->>User: 根据认证状态更新UI或跳转
+    end
+    
+    %% ------ 生物识别登录流程 ------
+    rect rgb(240, 255, 240)
+    Note right of User: 生物识别登录流程
+    
+    User->>LoginView: 点击"Face ID / Touch ID登录"按钮
+    
+    LoginView->>AuthViewModel: authenticateWithBiometric()
+    activate AuthViewModel
+    
+    alt 在模拟器环境且有保存的令牌
+        AuthViewModel->>AuthViewModel: isLoading = true
+        AuthViewModel->>AuthService: authenticateWithBiometric()
+        activate AuthService
+        AuthService->>Keychain: 获取保存的令牌
+        AuthService->>GitHubAPI: 使用令牌获取用户信息
+        activate GitHubAPI
+        GitHubAPI-->>AuthService: 返回用户数据
+        deactivate GitHubAPI
+        AuthService-->>AuthViewModel: 返回结果
+        deactivate AuthService
+    else 真机环境或无保存令牌
+        AuthViewModel->>LAContext: 检查是否可以使用生物识别
+        alt 可以使用生物识别
+            AuthViewModel->>LAContext: 请求生物识别验证
+            activate LAContext
+            Note over LAContext: 显示Face ID/Touch ID界面
+            LAContext-->>AuthViewModel: 验证结果
+            deactivate LAContext
+            
+            alt 验证成功
+                AuthViewModel->>AuthService: authenticateWithBiometric()
+                activate AuthService
+                AuthService->>Keychain: 获取保存的令牌
+                AuthService->>GitHubAPI: 使用令牌获取用户信息
+                activate GitHubAPI
+                GitHubAPI-->>AuthService: 返回用户数据
+                deactivate GitHubAPI
+                AuthService-->>AuthViewModel: 返回结果
+                deactivate AuthService
+            else 验证失败
+                AuthViewModel->>AuthViewModel: error = error
+            end
+        else 不能使用生物识别
+            AuthViewModel->>AuthViewModel: error = error
+        end
+    end
+    
+    alt 认证成功
+        AuthViewModel->>AuthViewModel: isAuthenticated = true, currentUser = user
+    else 认证失败
+        AuthViewModel->>AuthViewModel: error = error
+    end
+    
+    AuthViewModel->>AuthViewModel: isLoading = false
+    deactivate AuthViewModel
+    
+    LoginView-->>User: 根据认证状态更新UI或跳转
+    end
+    
+    %% ------ 自动检查登录状态 ------
+    rect rgb(255, 240, 240)
+    Note right of User: 自动检查登录状态
+    
+    GitHubApp->>AuthViewModel: 应用启动/恢复活动状态
+    activate AuthViewModel
+    
+    AuthViewModel->>AuthViewModel: isLoading = true
+    
+    AuthViewModel->>AuthService: checkToken()
+    activate AuthService
+    
+    AuthService->>Keychain: 获取保存的令牌
+    
+    alt 找到令牌
+        AuthService->>GitHubAPI: 使用令牌获取用户信息
+        activate GitHubAPI
+        GitHubAPI-->>AuthService: 返回用户数据/错误
+        deactivate GitHubAPI
+        
+        alt API调用成功
+            AuthService-->>AuthViewModel: 成功结果(User)
+        else API调用失败(令牌无效)
+            AuthService->>Keychain: 删除无效令牌
+            AuthService-->>AuthViewModel: 失败结果(Error)
+        end
+    else 未找到令牌
+        AuthService-->>AuthViewModel: 失败结果(tokenNotFound)
+    end
+    
+    deactivate AuthService
+    
+    alt 验证成功
+        AuthViewModel->>AuthViewModel: isAuthenticated = true, currentUser = user
+    else 验证失败
+        AuthViewModel->>AuthViewModel: isAuthenticated = false, currentUser = nil
+    end
+    
+    AuthViewModel->>AuthViewModel: isLoading = false
+    deactivate AuthViewModel
+    end 

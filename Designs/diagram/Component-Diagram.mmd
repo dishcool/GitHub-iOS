@@ -1,0 +1,77 @@
+graph TD
+    subgraph UI Layer
+        direction LR
+        MainTabView["MainTabView (TabView)"]
+        Views["Views (HomeView, ProfileView, etc.)"]
+        CustomComponents["Custom Components (RepositoryCard, LoadingIndicator, etc.)"]
+    end
+
+    subgraph ViewModel Layer
+        direction LR
+        AuthViewModel["AuthViewModel"]
+        HomeViewModel["HomeViewModel"]
+        ProfileViewModel["ProfileViewModel"]
+        SearchViewModel["SearchViewModel"]
+        RepoDetailViewModel["RepositoryDetailViewModel"]
+    end
+
+    subgraph Service Layer
+        direction TB
+        Services["Services"]
+        subgraph Service Implementations
+            direction LR
+            AuthService["AuthenticationService"]
+            NetworkService["NetworkService"]
+            RepoService["RepositoryService"]
+            UserService["UserService"]
+        end
+        subgraph Service Protocols
+            direction LR
+            AuthServiceProtocol["AuthenticationServiceProtocol"]
+            NetworkServiceProtocol["NetworkServiceProtocol"]
+            RepoServiceProtocol["RepositoryServiceProtocol"]
+            UserServiceProtocol["UserServiceProtocol"]
+        end
+    end
+
+    subgraph Data Layer
+        direction LR
+        Models["Models (User, Repository, Organization)"]
+        KeychainStorage["Keychain Storage"]
+        Cache["In-Memory Cache"]
+    end
+
+    subgraph External
+        direction LR
+        GitHubAPI["GitHub API"]
+        OAuthSwift["OAuthSwift"]
+        BiometricAuth["Biometric Authentication"]
+    end
+
+    UI_Layer --> ViewModel_Layer
+    ViewModel_Layer --> Service_Layer
+    Service_Layer --> Data_Layer
+    Service_Layer --> External
+
+    AuthService --> AuthServiceProtocol
+    NetworkService --> NetworkServiceProtocol
+    RepoService --> RepoServiceProtocol
+    UserService --> UserServiceProtocol
+
+    AuthService --> NetworkService
+    RepoService --> NetworkService
+    UserService --> NetworkService
+
+    AuthService --> KeychainStorage
+    NetworkService --> Cache
+
+    MainTabView --> Views
+    Views --> CustomComponents
+
+    AuthViewModel --> AuthService
+    HomeViewModel --> RepoService
+    ProfileViewModel --> UserService
+    ProfileViewModel --> RepoService
+    SearchViewModel --> RepoService
+    SearchViewModel --> UserService
+    RepoDetailViewModel --> RepoService 

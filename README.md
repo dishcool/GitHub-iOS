@@ -79,6 +79,71 @@
   </p>
 </div>
 
+## 生物识别认证配置
+
+要使用Face ID或Touch ID：
+
+1. 在Info.plist中添加`NSFaceIDUsageDescription`键，并提供使用生物识别的原因描述
+
+## 架构设计
+
+本项目采用MVVM架构模式和Protocol Oriented设计原则，通过以下图表展示系统的详细设计：
+
+### 组件图
+
+<div align="center">
+  <img src="Designs/diagram/Component-Diagram.png" width="700" alt="组件架构图"/>
+</div>
+<p align="center">
+  <em>GitHub iOS应用的组件架构图 - 展示了不同层级间的依赖关系</em>
+</p>
+
+组件图展示了应用的整体架构，包括UI层、ViewModel层、Service层和Data层的主要组件及其相互依赖关系。该架构严格遵循单向数据流原则，确保了代码的可维护性和可测试性。
+
+### 类图
+
+<div align="center">
+  <img src="Designs/diagram/Class-Diagram.png" width="700" alt="类图"/>
+</div>
+<p align="center">
+  <em>GitHub iOS应用的类图 - 描述主要类及其关系</em>
+</p>
+
+类图详细展示了应用中的主要类、协议及其关系。它展示了如何通过协议实现依赖注入，以及各个模块之间如何通过接口进行通信。
+
+### 登录流程序列图
+
+登录流程序列图详细描述了三种登录方式的实现过程：
+
+#### 1. OAuth登录
+
+<div align="center">
+  <img src="Designs/diagram/Login-Sequence-Diagram.png" width="750" alt="OAuth登录流程序列图"/>
+</div>
+<p align="center">
+  <em>GitHub OAuth登录流程 - 通过GitHub网站完成授权</em>
+</p>
+
+#### 2. 生物识别登录
+
+<div align="center">
+  <img src="Designs/diagram/Login-Sequence-Diagram-Bio.png" width="750" alt="生物识别登录流程序列图"/>
+</div>
+<p align="center">
+  <em>生物识别登录流程 - 使用Face ID或Touch ID验证身份</em>
+</p>
+
+#### 3. 自动登录
+
+<div align="center">
+  <img src="Designs/diagram/Login-Sequence-Diagram-Auto.png" width="750" alt="自动登录流程序列图"/>
+</div>
+<p align="center">
+  <em>自动登录流程 - 应用启动时验证已保存的令牌</em>
+</p>
+
+以上图表使用Mermaid Markdown语法创建，源文件位于`Designs/diagram/`目录下。要查看这些图表，您可以使用支持Mermaid的编辑器（如VS Code加装Mermaid扩展）或在线工具如[Mermaid Live Editor](https://mermaid.live/)预览。
+
 ## 项目设置
 
 ### 系统要求
@@ -123,12 +188,6 @@
    - 在Xcode项目中选择目标，然后选择"Info"选项卡
    - 展开"URL Types"部分
    - 添加一个新的URL Type，设置Identifier为"com.yourcompany.github"，URL Schemes为"github"
-
-### 生物识别认证配置
-
-要使用Face ID或Touch ID：
-
-1. 在Info.plist中添加`NSFaceIDUsageDescription`键，并提供使用生物识别的原因描述
 
 ## 项目结构
 

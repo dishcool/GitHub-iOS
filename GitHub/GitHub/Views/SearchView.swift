@@ -13,12 +13,12 @@ struct SearchView: View {
     
     var body: some View {
         VStack {
-            // 搜索栏
+            // Search bar
             HStack {
                 Image(systemName: "magnifyingglass")
                     .foregroundColor(.gray)
                 
-                TextField("搜索GitHub", text: $viewModel.searchQuery)
+                TextField("Search GitHub", text: $viewModel.searchQuery)
                     .autocapitalization(.none)
                     .disableAutocorrection(true)
                 
@@ -36,7 +36,7 @@ struct SearchView: View {
             .cornerRadius(10)
             .padding(.horizontal)
             
-            // 分段控制器
+            // Segment controller
             Picker("Search Type", selection: $viewModel.selectedSegment) {
                 ForEach(SearchSegment.allCases, id: \.self) { segment in
                     Text(segment.title).tag(segment)
@@ -50,16 +50,16 @@ struct SearchView: View {
                 }
             }
             
-            // 搜索结果
+            // Search results
             if viewModel.isLoading {
-                LoadingView(message: "正在搜索...")
+                LoadingView(message: "Searching...")
             } else {
                 ScrollView {
                     LazyVStack(spacing: 16) {
                         switch viewModel.selectedSegment {
                         case .repositories:
                             if viewModel.repositories.isEmpty && !viewModel.searchQuery.isEmpty {
-                                Text("未找到匹配的仓库")
+                                Text("No matching repositories found")
                                     .foregroundColor(.secondary)
                                     .padding()
                             } else {
@@ -73,7 +73,7 @@ struct SearchView: View {
                             
                         case .users:
                             if viewModel.users.isEmpty && !viewModel.searchQuery.isEmpty {
-                                Text("未找到匹配的用户")
+                                Text("No matching users found")
                                     .foregroundColor(.secondary)
                                     .padding()
                             } else {
@@ -87,7 +87,7 @@ struct SearchView: View {
                             
                         case .organizations:
                             if viewModel.organizations.isEmpty && !viewModel.searchQuery.isEmpty {
-                                Text("未找到匹配的组织")
+                                Text("No matching organizations found")
                                     .foregroundColor(.secondary)
                                     .padding()
                             } else {
@@ -104,7 +104,7 @@ struct SearchView: View {
                 }
             }
         }
-        .navigationTitle("搜索")
+        .navigationTitle("Search")
     }
 }
 

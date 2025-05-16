@@ -7,7 +7,7 @@
 
 import Foundation
 
-/// 代表GitHub用户的模型
+/// Model representing a GitHub user
 struct User: Identifiable, Codable {
     let id: Int
     let login: String

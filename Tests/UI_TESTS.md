@@ -1,135 +1,135 @@
 # GitHub iOS App UI Tests
 
-## 测试概述
+## Test Overview
 
-本项目包含以下主要 UI 测试套件：
+This project contains the following main UI test suites:
 
-1. **GitHubUITests** - 全面 UI 功能测试
-   - 测试登录界面元素和流程
-   - 测试未登录状态下的主页访问
-   - 测试搜索功能
-   - 测试仓库详情页面
-   - 测试深色模式切换
-   - 测试个人资料页面和登录导航
-   - 测试屏幕旋转和截图功能
+1. **GitHubUITests** - Comprehensive UI functionality tests
+   - Tests login interface elements and flows
+   - Tests home page access without login
+   - Tests search functionality
+   - Tests repository details page
+   - Tests dark mode switching
+   - Tests profile page and login navigation
+   - Tests screen rotation and screenshot features
 
-2. **GitHubUITestsLaunchTests** - 应用启动测试
-   - 测试应用启动性能和界面
-   - 测试应用图标
+2. **GitHubUITestsLaunchTests** - Application launch tests
+   - Tests application launch performance and interface
+   - Tests application icon
 
-## 测试结果
+## Test Results
 
-所有 UI 测试均成功通过，测试结果截图如下：
+All UI tests have passed successfully, test results screenshot below:
 
-![UI测试结果](/Users/dishcool/workspace/GitHub/GitHub-iOS/Tests/UITest-result.png)
+![UI Test Results](/Users/dishcool/workspace/GitHub/GitHub-iOS/Tests/UITest-result.png)
 
-> **注意**：测试结果截图保存在 `Tests/UITest-result.png` 文件中。如需查看最新测试结果，请运行测试套件并查看 Xcode 测试报告。测试报告中还包含了每个测试自动捕获的屏幕截图，可以帮助分析和验证 UI 行为。
+> **Note**: Test results screenshots are saved in the `Tests/UITest-result.png` file. To view the latest test results, please run the test suite and check the Xcode test report. The test report also includes screenshots automatically captured by each test, which can help analyze and verify UI behavior.
 
-## 如何运行 UI 测试
+## How to Run UI Tests
 
-### 使用 Xcode 运行测试
+### Running Tests with Xcode
 
-1. 在 Xcode 中打开项目
-2. 选择一个模拟器（推荐 iPhone 14 或更新的设备）
-3. 使用快捷键 `Cmd+U` 运行所有测试，或者在测试导航器(⌘+6)中选择特定的 UI 测试类或方法
+1. Open the project in Xcode
+2. Select a simulator (iPhone 14 or newer device recommended)
+3. Use the shortcut `Cmd+U` to run all tests, or select specific UI test classes or methods in the test navigator (⌘+6)
 
-### 使用命令行运行测试
+### Running Tests with Command Line
 
 ```bash
-# 运行所有 UI 测试
+# Run all UI tests
 xcodebuild test -project GitHub.xcodeproj -scheme GitHub -destination 'platform=iOS Simulator,name=iPhone 14' -testPlan UITests
 
-# 运行特定 UI 测试类
+# Run specific UI test class
 xcodebuild test -project GitHub.xcodeproj -scheme GitHub -destination 'platform=iOS Simulator,name=iPhone 14' -only-testing:GitHubUITests/GitHubUITests
 ```
 
-## 测试文件位置
+## Test File Locations
 
-UI 测试文件位于项目的 `GitHub/GitHubUITests` 目录中：
+UI test files are located in the project's `GitHub/GitHubUITests` directory:
 
-- `GitHubUITests.swift` - 全面 UI 功能测试（包含导航、搜索、个人资料等测试）
-- `GitHubUITestsLaunchTests.swift` - 应用启动测试
+- `GitHubUITests.swift` - Comprehensive UI functionality tests (includes navigation, search, profile tests, etc.)
+- `GitHubUITestsLaunchTests.swift` - Application launch tests
 
-> **注意**：所有 UI 测试已整合到 `GitHubUITests.swift` 文件中，提高了代码复用性和测试维护效率。
+> **Note**: All UI tests have been integrated into the `GitHubUITests.swift` file, improving code reuse and test maintenance efficiency.
 
-## UI 测试策略
+## UI Testing Strategy
 
-本项目采用了以下 UI 测试策略：
+This project employs the following UI testing strategies:
 
-1. **页面元素验证** - 确保关键 UI 元素存在并可交互
-2. **用户流程测试** - 测试用户完成特定任务的流程
-3. **深色模式适配** - 验证应用在不同外观模式下的表现
-4. **性能测试** - 测量应用启动时间和关键操作的性能
-5. **辅助方法复用** - 通过共享辅助方法减少代码重复
-6. **视觉验证** - 通过截图捕获并验证界面外观
+1. **Page Element Validation** - Ensuring key UI elements exist and are interactive
+2. **User Flow Testing** - Testing user flows for completing specific tasks
+3. **Dark Mode Adaptation** - Verifying application appearance in different appearance modes
+4. **Performance Testing** - Measuring application launch time and performance of key operations
+5. **Helper Method Reuse** - Reducing code duplication through shared helper methods
+6. **Visual Verification** - Capturing and verifying interface appearance through screenshots
 
-## UI 测试最佳实践
+## UI Testing Best Practices
 
-在编写和维护 UI 测试时，请遵循以下最佳实践：
+When writing and maintaining UI tests, follow these best practices:
 
-1. **使用可靠的标识符**
-   - 为关键 UI 元素设置 `accessibilityIdentifier`
-   - 避免使用硬编码的文本字符串（除非是固定不变的标题）
+1. **Use Reliable Identifiers**
+   - Set `accessibilityIdentifier` for key UI elements
+   - Avoid hardcoded text strings (unless they are fixed titles)
 
-2. **处理异步操作**
-   - 使用 `waitForExistence` 或 `XCTNSPredicateExpectation` 等待异步操作完成
-   - 避免使用固定的 `sleep` 时间（除非绝对必要）
+2. **Handle Asynchronous Operations**
+   - Use `waitForExistence` or `XCTNSPredicateExpectation` to wait for asynchronous operations to complete
+   - Avoid fixed `sleep` times (unless absolutely necessary)
 
-3. **测试环境隔离**
-   - UI 测试应该能在任何环境中运行，不依赖于特定的网络状态或账户
-   - 考虑使用模拟数据或测试账户
+3. **Test Environment Isolation**
+   - UI tests should run in any environment, not dependent on specific network states or accounts
+   - Consider using mock data or test accounts
 
-4. **截图和附件**
-   - 在关键步骤添加截图，便于调试和记录
-   - 使用 `XCTAttachment` 记录测试环境信息
+4. **Screenshots and Attachments**
+   - Add screenshots at key steps for debugging and documentation
+   - Use `XCTAttachment` to record test environment information
 
-5. **通用辅助方法**
-   - 创建通用的辅助方法以提高代码复用性
-   - 例如 `findTabByName`、`waitForAnyElement` 等方法
+5. **Common Helper Methods**
+   - Create common helper methods to improve code reusability
+   - Examples include `findTabByName`, `waitForAnyElement`, etc.
 
-## 常见问题与解决方案
+## Common Issues and Solutions
 
-### 1. 元素识别问题
+### 1. Element Recognition Issues
 
-**问题**：UI 测试无法找到特定元素。
+**Problem**: UI tests cannot find specific elements.
 
-**解决方案**：
-- 确保元素有唯一的 `accessibilityIdentifier`
-- 使用 Xcode 的录制功能识别元素
-- 尝试使用不同的查询方法，如 `buttons.matching(NSPredicate(...))`
-- 使用更灵活的查找方法，如 `findTabByName` 支持多种可能的名称
+**Solution**:
+- Ensure elements have unique `accessibilityIdentifier`
+- Use Xcode's recording feature to identify elements
+- Try different query methods, such as `buttons.matching(NSPredicate(...))`
+- Use more flexible finding methods, such as `findTabByName` supporting multiple possible names
 
-### 2. 测试稳定性问题
+### 2. Test Stability Issues
 
-**问题**：UI 测试有时通过，有时失败。
+**Problem**: UI tests sometimes pass, sometimes fail.
 
-**解决方案**：
-- 添加适当的等待机制，确保 UI 元素加载完成
-- 避免依赖特定的网络状态或外部服务
-- 增加测试的健壮性，处理可能的异常情况
-- 添加更多的调试信息，如 UI 层次结构的打印
+**Solution**:
+- Add appropriate waiting mechanisms to ensure UI elements are loaded
+- Avoid depending on specific network states or external services
+- Increase test robustness by handling possible exception cases
+- Add more debugging information, such as printing UI hierarchy
 
-### 3. 登录状态管理
+### 3. Login State Management
 
-**问题**：测试需要在登录和未登录状态下运行。
+**Problem**: Tests need to run in both logged-in and logged-out states.
 
-**解决方案**：
-- 使用辅助方法模拟登录状态
-- 考虑使用测试账户或模拟 API 响应
-- 在测试之间清理应用状态
+**Solution**:
+- Use helper methods to simulate login state
+- Consider using test accounts or mock API responses
+- Clean application state between tests
 
-### 4. 设备方向和外观模式测试
+### 4. Device Orientation and Appearance Mode Testing
 
-**问题**：测试深色模式和设备旋转时可能遇到 API 限制。
+**Problem**: Testing dark mode and device rotation may encounter API limitations.
 
-**解决方案**：
-- 使用合适的替代方法，如通过截图来检查界面变化
-- 使用 `UIDevice.current.setValue` 代替直接的 `rotate` 方法
-- 提供多种测试选项，确保至少一种方法能在当前环境中工作
+**Solution**:
+- Use suitable alternatives, such as checking interface changes through screenshots
+- Use `UIDevice.current.setValue` instead of direct `rotate` methods
+- Provide multiple testing options to ensure at least one method works in the current environment
 
-## 注意事项
+## Notes
 
-- UI 测试需要在模拟器或真机上运行，不能在 CI 环境中无头运行
-- 某些测试（如深色模式测试）需要 iOS 13.0 或更高版本
-- 应用图标测试可能需要特殊权限，在某些环境中可能不工作
-- 运行 UI 测试前，请确保模拟器处于正常状态（无弹窗或其他干扰） 
+- UI tests need to run on simulators or physical devices, cannot run headless in CI environments
+- Some tests (such as dark mode tests) require iOS 13.0 or higher
+- App icon tests may require special permissions and might not work in some environments
+- Before running UI tests, ensure the simulator is in normal state (no pop-ups or other interference) 

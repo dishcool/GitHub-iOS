@@ -17,11 +17,11 @@ struct GitHubApp: App {
             MainTabView()
                 .environmentObject(authViewModel)
                 .onOpenURL { url in
-                    // 这里是 App 捕捉回调 URL 的地方
+                    // This is where the App captures the callback URL
                     OAuthSwift.handle(url: url)
                 }
                 .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
-                    // 当应用重新激活时检查加载状态
+                    // Check loading state when the app is reactivated
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                         authViewModel.resetLoadingState()
                     }

@@ -1,60 +1,60 @@
-# GitHub iOS 应用架构图表
+# GitHub iOS App Architecture Diagrams
 
-本目录包含GitHub iOS应用的架构设计图表，使用Mermaid Markdown格式创建。
+This directory contains architecture design diagrams for the GitHub iOS app, created using Mermaid Markdown format.
 
-## 文件说明
+## File Descriptions
 
-- `Component-Diagram.mmd`: 应用组件架构图，展示不同层级及其依赖关系
-- `Class-Diagram.mmd`: 应用类图，展示主要类及其关系
-- `Login-Sequence-Diagram.mmd`: 登录流程序列图，详细展示三种登录方式的流程
+- `Component-Diagram.mmd`: Application component architecture diagram, showing different layers and their dependencies
+- `Class-Diagram.mmd`: Application class diagram, showing main classes and their relationships
+- `Login-Sequence-Diagram.mmd`: Login process sequence diagram, detailing the flow of three login methods
 
-## 如何预览这些图表
+## How to Preview These Diagrams
 
-由于Mermaid是基于文本的图表格式，您需要使用支持Mermaid的工具来预览这些图表：
+Since Mermaid is a text-based diagram format, you need to use tools that support Mermaid to preview these diagrams:
 
-### 方法1: 使用VS Code (推荐)
-1. 安装VS Code编辑器
-2. 安装"Markdown Preview Mermaid Support"扩展
-3. 打开MMD文件
-4. 按`Cmd+Shift+V`(Mac)或`Ctrl+Shift+V`(Windows)预览
+### Method 1: Using VS Code (Recommended)
+1. Install VS Code editor
+2. Install the "Markdown Preview Mermaid Support" extension
+3. Open the MMD files
+4. Press `Cmd+Shift+V` (Mac) or `Ctrl+Shift+V` (Windows) to preview
 
-### 方法2: 使用在线编辑器
-1. 访问[Mermaid Live Editor](https://mermaid.live/)
-2. 复制MMD文件内容到编辑器左侧
-3. 右侧将显示渲染后的图表
+### Method 2: Using Online Editor
+1. Visit [Mermaid Live Editor](https://mermaid.live/)
+2. Copy the MMD file content to the left side of the editor
+3. The rendered diagram will display on the right
 
-### 方法3: 导出为PNG/SVG格式
-要将图表导出为图片格式，您可以：
+### Method 3: Export to PNG/SVG Format
+To export diagrams to image format, you can:
 
-1. 使用Mermaid命令行工具：
+1. Use the Mermaid command line tool:
    ```bash
-   # 安装工具
+   # Install the tool
    npm install -g @mermaid-js/mermaid-cli
    
-   # 转换为PNG
+   # Convert to PNG
    mmdc -i Component-Diagram.mmd -o Component-Diagram.png
    mmdc -i Class-Diagram.mmd -o Class-Diagram.png
    mmdc -i Login-Sequence-Diagram.mmd -o Login-Sequence-Diagram.png
    ```
 
-2. 或使用在线编辑器导出:
-   - 在[Mermaid Live Editor](https://mermaid.live/)中渲染图表
-   - 点击右上角"Export"按钮
-   - 选择PNG或SVG格式下载
+2. Or export using the online editor:
+   - Render the diagram in [Mermaid Live Editor](https://mermaid.live/)
+   - Click the "Export" button in the top right
+   - Select PNG or SVG format to download
 
-## 修改图表
+## Modifying Diagrams
 
-如需修改这些架构图表：
-1. 使用文本编辑器编辑相应的MMD文件
-2. 使用上述方法预览修改效果
-3. 导出更新后的图片以更新文档
+To modify these architecture diagrams:
+1. Edit the corresponding MMD file using a text editor
+2. Preview the modified effect using the methods described above
+3. Export updated images to update documentation
 
-## 图表渲染示例
+## Diagram Rendering Examples
 
-图表在README中的渲染效果示例：
+Example of diagram rendering in README:
 
-![组件架构图](Component-Diagram.png)
-![类图](Class-Diagram.png)
-![登录流程序列图](Login-Sequence-Diagram.png)
+![Component Architecture Diagram](Component-Diagram.png)
+![Class Diagram](Class-Diagram.png)
+![Login Process Sequence Diagram](Login-Sequence-Diagram.png)
 
-注意: 请确保导出这些PNG文件并放置在此目录中，以便README中的图片链接正常显示。 
+Note: Please ensure these PNG files are exported and placed in this directory for the image links in the README to display properly. 

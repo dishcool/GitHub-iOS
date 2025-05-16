@@ -10,24 +10,24 @@ import SwiftUI
 struct HomeView: View {
     @StateObject private var viewModel = HomeViewModel()
     
-    // 常用编程语言列表
+    // Common programming languages list
     private let languages = ["Swift", "Kotlin", "JavaScript", "Python", "Go", "Rust", "Java", "C++", "TypeScript", "PHP", "Ruby"]
     
-    // 时间范围选项
+    // Time range options
     private let timeSpans = [
-        ("day", "今天"),
-        ("week", "本周"),
-        ("month", "本月"),
-        ("year", "今年")
+        ("day", "Today"),
+        ("week", "This Week"),
+        ("month", "This Month"),
+        ("year", "This Year")
     ]
     
-    // 是否显示缓存控制选项
+    // Whether to show cache control options
     private let showCacheControl = false
     
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                // 语言过滤器
+                // Language filter
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 12) {
                         Button(action: {
@@ -57,7 +57,7 @@ struct HomeView: View {
                     .padding(.horizontal)
                 }
                 
-                // 时间范围过滤器
+                // Time range filter
                 HStack(spacing: 16) {
                     ForEach(timeSpans, id: \.0) { timeSpan in
                         Button(action: {
@@ -74,12 +74,12 @@ struct HomeView: View {
                 }
                 .padding(.horizontal)
                 
-                // API速率限制警告
+                // API rate limit warning
                 if viewModel.showingRateLimitWarning {
                     HStack {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .foregroundColor(.yellow)
-                        Text("GitHub API 请求次数已达上限，将使用缓存数据")
+                        Text("GitHub API request limit reached, will use cached data")
                             .font(.footnote)
                             .foregroundColor(.secondary)
                     }
@@ -90,10 +90,10 @@ struct HomeView: View {
                     .padding(.horizontal)
                 }
                 
-                // 缓存控制
+                // Cache control
                 if showCacheControl {
                     HStack {
-                        Toggle("使用缓存", isOn: $viewModel.useCacheForRequests)
+                        Toggle("Use Cache", isOn: $viewModel.useCacheForRequests)
                             .toggleStyle(SwitchToggleStyle(tint: .blue))
                         
                         Spacer()
@@ -104,7 +104,7 @@ struct HomeView: View {
                         }) {
                             HStack(spacing: 4) {
                                 Image(systemName: "trash")
-                                Text("清除缓存")
+                                Text("Clear Cache")
                                     .font(.footnote)
                             }
                         }
@@ -116,22 +116,22 @@ struct HomeView: View {
                     .padding(.horizontal)
                 }
                 
-                // 仓库列表
+                // Repository list
                 if viewModel.isLoading {
-                    LoadingView(message: "正在加载热门仓库...")
+                    LoadingView(message: "Loading trending repositories...")
                         .frame(height: 300)
                 } else if let errorMessage = viewModel.errorMessage {
                     VStack(spacing: 24) {
                         Spacer()
                             .frame(height: 20)
                         
-                        // 错误图标
+                        // Error icon
                         Image(systemName: "exclamationmark.icloud.fill")
                             .font(.system(size: 60))
                             .foregroundColor(.red.opacity(0.8))
                             .padding(.bottom, 10)
                         
-                        Text("加载失败")
+                        Text("Load failed")
                             .font(.title2)
                             .fontWeight(.bold)
                         
@@ -142,12 +142,12 @@ struct HomeView: View {
                             .padding(.bottom, 10)
                         
                         Button(action: {
-                            // 重试刷新
+                            // Retry refresh
                             viewModel.refreshRepositories()
                         }) {
                             HStack {
                                 Image(systemName: "arrow.triangle.2.circlepath")
-                                Text("重试刷新")
+                                Text("Retry Refresh")
                             }
                             .padding(.horizontal, 24)
                             .padding(.vertical, 12)
@@ -173,7 +173,7 @@ struct HomeView: View {
                     .padding(.horizontal, 20)
                     .padding(.vertical, 10)
                 } else if viewModel.repositories.isEmpty {
-                    Text("没有找到符合条件的仓库")
+                    Text("No repositories found that match the criteria")
                         .foregroundColor(.secondary)
                         .padding(.top, 50)
                 } else {
@@ -190,7 +190,7 @@ struct HomeView: View {
             }
             .padding(.vertical)
         }
-        .navigationTitle("热门仓库")
+        .navigationTitle("Trending Repositories")
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {

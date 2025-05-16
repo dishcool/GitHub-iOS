@@ -27,12 +27,12 @@ struct IssuesListView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // 自定义搜索栏
+            // Custom search bar
             HStack {
                 Image(systemName: "magnifyingglass")
                     .foregroundColor(.gray)
                 
-                TextField("搜索Issues", text: $searchText)
+                TextField("Search Issues", text: $searchText)
                     .disableAutocorrection(true)
                 
                 if !searchText.isEmpty {
@@ -52,15 +52,15 @@ struct IssuesListView: View {
             
             ZStack {
                 if viewModel.isLoading {
-                    LoadingView(message: "正在加载Issues...")
+                    LoadingView(message: "Loading issues...")
                 } else if let errorMessage = viewModel.errorMessage {
                     ErrorView(message: errorMessage) {
                         viewModel.loadIssues(owner: owner, repo: repoName)
                     }
                 } else if viewModel.issues.isEmpty {
-                    EmptyStateView(message: "该仓库没有Issues")
+                    EmptyStateView(message: "This repository has no issues")
                 } else {
-                    // 内容视图
+                    // Content view
                     ZStack(alignment: .bottomTrailing) {
                         List {
                             ForEach(filteredIssues) { issue in
@@ -70,7 +70,7 @@ struct IssuesListView: View {
                             }
                         }
                         
-                        // 刷新按钮
+                        // Refresh button
                         Button(action: {
                             viewModel.loadIssues(owner: owner, repo: repoName)
                         }) {
@@ -137,7 +137,7 @@ struct IssueRowView: View {
             }
             .foregroundColor(.secondary)
             
-            // 标签显示
+            // Display labels
             if let labels = issue.labels, !labels.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack {
@@ -182,7 +182,7 @@ struct LabelView: View {
     
     func isDarkColor(hex: String) -> Bool {
         let color = Color(hex: hex)
-        // 简单判断颜色是否为深色
+        // Simple check if the color is dark
         let uiColor = UIColor(color)
         var red: CGFloat = 0
         var green: CGFloat = 0
@@ -191,7 +191,7 @@ struct LabelView: View {
         
         uiColor.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
         
-        // 使用亮度公式: (0.299*R + 0.587*G + 0.114*B)
+        // Using brightness formula: (0.299*R + 0.587*G + 0.114*B)
         let brightness = (red * 0.299) + (green * 0.587) + (blue * 0.114)
         
         return brightness < 0.6
@@ -242,7 +242,7 @@ struct EmptyStateView: View {
     }
 }
 
-// 使用自定义的错误视图
+// Using custom error view
 struct ErrorView: View {
     let message: String
     let retryAction: () -> Void
@@ -253,7 +253,7 @@ struct ErrorView: View {
                 .font(.system(size: 60))
                 .foregroundColor(.red)
             
-            Text("加载失败")
+            Text("Loading Failed")
                 .font(.title2)
                 .fontWeight(.bold)
             
@@ -266,7 +266,7 @@ struct ErrorView: View {
             Button(action: retryAction) {
                 HStack {
                     Image(systemName: "arrow.clockwise")
-                    Text("重试")
+                    Text("Retry")
                 }
                 .padding()
                 .background(Color.blue)

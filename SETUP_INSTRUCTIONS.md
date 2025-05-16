@@ -1,61 +1,61 @@
-# GitHub iOS App - 设置指南
+# GitHub iOS App - Setup Guide
 
-本文档提供了设置GitHub iOS应用的详细步骤，包括添加依赖、配置OAuth和完成项目设置。
+This document provides detailed steps for setting up the GitHub iOS application, including adding dependencies, configuring OAuth, and completing project setup.
 
-## 添加Swift Package Manager依赖
+## Adding Swift Package Manager Dependencies
 
-1. 打开Xcode项目
-2. 选择 File > Add Packages...
-3. 在搜索栏中添加以下包（逐个添加）：
+1. Open the Xcode project
+2. Select File > Add Packages...
+3. Add the following packages in the search bar (add one by one):
 
 ### Alamofire
 - URL: https://github.com/Alamofire/Alamofire.git
-- 版本: Up to Next Major (5.0.0)
-- 依赖规则: 5.6.0 <= 版本 < 6.0.0
+- Version: Up to Next Major (5.0.0)
+- Dependency Rule: 5.6.0 <= version < 6.0.0
 
 ### Kingfisher
 - URL: https://github.com/onevcat/Kingfisher.git
-- 版本: Up to Next Major (7.0.0) 
-- 依赖规则: 7.0.0 <= 版本 < 8.0.0
+- Version: Up to Next Major (7.0.0) 
+- Dependency Rule: 7.0.0 <= version < 8.0.0
 
 ### SwiftyJSON
 - URL: https://github.com/SwiftyJSON/SwiftyJSON.git
-- 版本: Up to Next Major (5.0.0)
-- 依赖规则: 5.0.0 <= 版本 < 6.0.0
+- Version: Up to Next Major (5.0.0)
+- Dependency Rule: 5.0.0 <= version < 6.0.0
 
 ### KeychainSwift
 - URL: https://github.com/evgenyneu/keychain-swift.git
-- 版本: Up to Next Major (20.0.0)
-- 依赖规则: 20.0.0 <= 版本 < 21.0.0
+- Version: Up to Next Major (20.0.0)
+- Dependency Rule: 20.0.0 <= version < 21.0.0
 
 ### OAuthSwift
 - URL: https://github.com/OAuthSwift/OAuthSwift.git
-- 版本: Up to Next Major (2.0.0)
-- 依赖规则: 2.2.0 <= 版本 < 3.0.0
+- Version: Up to Next Major (2.0.0)
+- Dependency Rule: 2.2.0 <= version < 3.0.0
 
-## 项目设置
+## Project Setup
 
-### 更新iOS部署目标
-1. 选择项目导航器中的项目
-2. 选择GitHub目标
-3. 在"General"选项卡中，将"Deployment Info"下的"iOS Deployment Target"设置为14.0
+### Update iOS Deployment Target
+1. Select the project in the project navigator
+2. Select the GitHub target
+3. In the "General" tab, set "iOS Deployment Target" under "Deployment Info" to 14.0
 
-### 添加Face ID权限
-1. 打开Info.plist文件
-2. 添加新键: NSFaceIDUsageDescription
-3. 值设置为: "使用Face ID登录您的GitHub账户"
+### Add Face ID Permission
+1. Open the Info.plist file
+2. Add a new key: NSFaceIDUsageDescription
+3. Set the value to: "Use Face ID to log in to your GitHub account"
 
-### 配置URL Scheme用于OAuth回调
-1. 选择项目导航器中的项目
-2. 选择GitHub目标
-3. 选择"Info"选项卡
-4. 展开"URL Types"部分
-5. 点击"+"按钮添加新的URL Type
-6. 设置Identifier为"com.yourcompany.github"
-7. URL Schemes设置为"github"
+### Configure URL Scheme for OAuth Callback
+1. Select the project in the project navigator
+2. Select the GitHub target
+3. Select the "Info" tab
+4. Expand the "URL Types" section
+5. Click the "+" button to add a new URL Type
+6. Set the Identifier to "com.yourcompany.github"
+7. Set URL Schemes to "github"
 
-### 创建缺少的目录结构
-确保在项目中创建以下目录结构：
+### Create Missing Directory Structure
+Ensure that the following directory structure is created in your project:
 
 ```
 GitHub/
@@ -71,57 +71,57 @@ GitHub/
     └── Extensions/
 ```
 
-## GitHub OAuth配置
+## GitHub OAuth Configuration
 
-要使用GitHub OAuth功能，您需要：
+To use the GitHub OAuth functionality, you need to:
 
-1. 在GitHub上注册一个新的OAuth应用：
-   - 访问 https://github.com/settings/applications/new
-   - 填写应用名称、主页URL（可以是任何URL）
-   - 回调URL设置为 `github://callback`
-   - 点击注册应用
+1. Register a new OAuth application on GitHub:
+   - Visit https://github.com/settings/applications/new
+   - Fill in the application name, homepage URL (can be any URL)
+   - Set the callback URL to `github://callback`
+   - Click Register Application
 
-2. 获取Client ID和Client Secret后，更新AuthenticationService.swift中的值：
+2. After obtaining the Client ID and Client Secret, update the values in AuthenticationService.swift:
 
 ```swift
 private let clientID = "YOUR_GITHUB_CLIENT_ID"
 private let clientSecret = "YOUR_GITHUB_CLIENT_SECRET"
 ```
 
-## 待实现的视图
+## Views to Implement
 
-要完成应用，还需要实现以下SwiftUI视图：
+To complete the application, you still need to implement the following SwiftUI views:
 
-1. HomeView.swift - 显示流行仓库
-2. SearchView.swift - 搜索仓库、用户和组织
-3. ProfileView.swift - 显示用户个人资料和仓库
-4. LoginView.swift - GitHub登录界面
-5. RepositoryDetailView.swift - 仓库详情页面
+1. HomeView.swift - Display popular repositories
+2. SearchView.swift - Search for repositories, users, and organizations
+3. ProfileView.swift - Display user profile and repositories
+4. LoginView.swift - GitHub login interface
+5. RepositoryDetailView.swift - Repository details page
 
-## 本地化支持
+## Localization Support
 
-为添加中文本地化支持：
+To add Chinese localization support:
 
-1. 选择项目导航器中的项目
-2. 选择GitHub目标
-3. 点击"+"按钮，选择"New File..."
-4. 选择"Strings File"，命名为"Localizable"
-5. 创建后，在项目导航器中选择该文件
-6. 在右侧检查器中点击"Localize..."按钮
-7. 选择"Chinese (Simplified)"
+1. Select the project in the project navigator
+2. Select the GitHub target
+3. Click the "+" button, select "New File..."
+4. Select "Strings File", name it "Localizable"
+5. After creation, select this file in the project navigator
+6. Click the "Localize..." button in the right inspector
+7. Select "Chinese (Simplified)"
 
-## 测试
+## Testing
 
-在实现UI后，应创建单元测试和UI测试：
+After implementing the UI, create unit tests and UI tests:
 
-1. 为服务层创建单元测试
-2. 为视图模型创建单元测试
-3. 为主要用户流程创建UI测试
+1. Create unit tests for the service layer
+2. Create unit tests for view models
+3. Create UI tests for major user flows
 
-## 最后步骤
+## Final Steps
 
-1. 清理项目，确保所有文件都添加到了正确的目标
-2. 构建并运行项目，确保没有编译错误
-3. 测试主要功能，确保一切正常工作
+1. Clean up the project, ensure all files are added to the correct target
+2. Build and run the project, ensure there are no compilation errors
+3. Test the main functionality, ensure everything works correctly
 
-祝您开发顺利！ 
+Good luck with your development!

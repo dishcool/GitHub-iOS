@@ -11,10 +11,10 @@ struct LoginView: View {
     @EnvironmentObject private var authViewModel: AuthViewModel
     @State private var hasToken: Bool = false
     
-    // 检测是否在模拟器环境中运行
+    // Detect if running in simulator environment
     private var isRunningOnSimulator: Bool {
         #if targetEnvironment(simulator)
-            return true  // 在模拟器环境中启用自动登录功能
+            return true  // Enable auto-login in simulator environment
         #else
             return false
         #endif
@@ -30,24 +30,24 @@ struct LoginView: View {
                     .frame(width: 100, height: 100)
                     .foregroundColor(.accentColor)
                 
-                Text("GitHub iOS客户端")
+                Text("GitHub iOS Client")
                     .font(.largeTitle)
                     .fontWeight(.bold)
                 
-                Text("探索GitHub的世界")
+                Text("Explore the world of GitHub")
                     .font(.title3)
                     .foregroundColor(.secondary)
             }
             .padding(.top, 50)
             
-            // 在模拟器环境下显示提示信息
+            // Display prompt in simulator environment
             if isRunningOnSimulator && hasToken {
                 VStack(spacing: 8) {
-                    Text("检测到模拟器环境")
+                    Text("Simulator Environment Detected")
                         .font(.headline)
                         .foregroundColor(.blue)
                     
-                    Text("已有账户将自动登录，无需生物识别")
+                    Text("Existing accounts will auto-login without biometric authentication")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
@@ -65,7 +65,7 @@ struct LoginView: View {
             
             // Login Buttons
             VStack(spacing: 20) {
-                // 只有之前未登录过的用户会显示GitHub账号登录按钮
+                // Only show GitHub account login button for users who haven't logged in before
                 if !hasToken {
                     Button(action: {
                         authViewModel.login()
@@ -74,7 +74,7 @@ struct LoginView: View {
                             Image(systemName: "person.fill")
                                 .foregroundColor(.white)
                             
-                            Text("GitHub账号登录")
+                            Text("Login with GitHub Account")
                                 .font(.headline)
                                 .foregroundColor(.white)
                         }
@@ -85,7 +85,7 @@ struct LoginView: View {
                     }
                 }
                 
-                // 对于模拟器环境，有令牌时显示一键自动登录按钮
+                // For simulator environment, show one-tap auto-login button when token exists
                 if isRunningOnSimulator && hasToken {
                     Button(action: {
                         authViewModel.authenticateWithBiometric()
@@ -94,7 +94,7 @@ struct LoginView: View {
                             Image(systemName: "arrow.right.circle.fill")
                                 .foregroundColor(.white)
                             
-                            Text("一键自动登录")
+                            Text("One-tap Auto Login")
                                 .font(.headline)
                                 .foregroundColor(.white)
                         }
@@ -104,7 +104,7 @@ struct LoginView: View {
                         .cornerRadius(10)
                     }
                 }
-                // 真机环境下，有令牌时显示生物识别登录按钮
+                // On physical devices, show biometric login button when token exists
                 else if hasToken {
                     Button(action: {
                         authViewModel.authenticateWithBiometric()
@@ -113,7 +113,7 @@ struct LoginView: View {
                             Image(systemName: "faceid")
                                 .foregroundColor(.accentColor)
                             
-                            Text("Face ID / Touch ID登录")
+                            Text("Login with Face ID / Touch ID")
                                 .font(.headline)
                                 .foregroundColor(.accentColor)
                         }
@@ -130,7 +130,7 @@ struct LoginView: View {
         .overlay(
             Group {
                 if authViewModel.isLoading {
-                    LoadingView(message: "正在登录...")
+                    LoadingView(message: "Logging in...")
                 }
             }
         )
@@ -139,21 +139,21 @@ struct LoginView: View {
             set: { _ in self.authViewModel.error = nil }
         )) { authError in
             Alert(
-                title: Text("登录失败"),
+                title: Text("Login Failed"),
                 message: Text(authError.message),
-                dismissButton: .default(Text("确定"))
+                dismissButton: .default(Text("OK"))
             )
         }
         .onAppear {
-            // 使用 AuthViewModel 的 hasToken 方法检查是否有之前的登录记录
+            // Use AuthViewModel's hasToken method to check for previous login records
             self.hasToken = authViewModel.hasToken()
             
-            // 检查并重置可能的挂起加载状态
+            // Check and reset potential pending loading state
             authViewModel.resetLoadingState()
         }
         .onDisappear {
-            // 当登录页面消失时，立即重置加载状态
-            // 这会处理用户点击登录按钮后通过手势返回或取消 OAuth 授权的情况
+            // Immediately reset loading state when login page disappears
+            // This handles cases where user taps login button then returns via gesture or cancels OAuth authorization
             authViewModel.resetLoadingState()
         }
     }
@@ -169,15 +169,15 @@ struct AuthError: Identifiable {
             let authError = error as! AuthenticationError
             switch authError {
             case .tokenNotFound:
-                return "未找到登录凭证，请使用GitHub账号登录"
+                return "Login credentials not found, please use GitHub account to log in"
             case .authorizationFailed:
-                return "GitHub授权失败，请稍后重试"
+                return "GitHub authorization failed, please try again later"
             case .networkError:
-                return "网络连接错误，请检查网络设置"
+                return "Network connection error, please check your network settings"
             case .biometricNotAvailable:
-                return "生物识别不可用，请使用GitHub账号登录"
+                return "Biometric authentication unavailable, please use GitHub account to log in"
             case .unknownError:
-                return "未知错误，请稍后重试"
+                return "Unknown error, please try again later"
             }
         default:
             return error.localizedDescription

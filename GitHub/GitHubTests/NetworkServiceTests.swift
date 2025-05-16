@@ -154,7 +154,7 @@ extension NetworkError {
 
 // MARK: - Mock Network Service
 class MockNetworkService: NetworkServiceProtocol {
-    // 使用一个枚举来更好地处理不同类型的结果
+    // Use an enum to better handle different types of results
     enum MockResultType {
         case success(Any)
         case failure(Error)
@@ -166,7 +166,7 @@ class MockNetworkService: NetworkServiceProtocol {
     var cacheClearedAll = false
     var cacheClearedForEndpoint = false
     var clearedEndpoint: String = ""
-    private var cachedEndpoints = Set<String>() // 跟踪已缓存的端点
+    private var cachedEndpoints = Set<String>() // Track cached endpoints
     
     func request<T: Decodable>(
         endpoint: String,
@@ -176,13 +176,13 @@ class MockNetworkService: NetworkServiceProtocol {
         useCache: Bool,
         completion: @escaping (Result<T, Error>) -> Void
     ) {
-        // 如果启用缓存并且端点已经被缓存，则不增加请求计数
+        // If cache is enabled and endpoint is already cached, don't increment request count
         let cacheKey = "\(endpoint)-\(method.rawValue)"
         let isCached = useCache && cachedEndpoints.contains(cacheKey)
         
         if shouldCountRequests && !isCached {
             requestCount += 1
-            // 如果启用了缓存，将端点添加到缓存集合中
+            // If cache is enabled, add the endpoint to the cache collection
             if useCache {
                 cachedEndpoints.insert(cacheKey)
             }

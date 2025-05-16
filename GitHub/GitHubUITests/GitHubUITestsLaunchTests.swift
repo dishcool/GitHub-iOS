@@ -22,25 +22,25 @@ final class GitHubUITestsLaunchTests: XCTestCase {
         let app = XCUIApplication()
         app.launch()
 
-        // 等待应用完全加载
+        // Wait for the app to fully load
         sleep(2)
         
-        // 验证关键UI元素是否存在
-        XCTAssertTrue(app.tabBars.firstMatch.exists, "标签栏应该存在")
+        // Verify key UI elements exist
+        XCTAssertTrue(app.tabBars.firstMatch.exists, "Tab bar should exist")
         
-        // 验证应用是否正确启动到登录页面或主页
-        let loginTitle = app.staticTexts["GitHub iOS客户端"]
+        // Verify app correctly launches to login page or home page
+        let loginTitle = app.staticTexts["GitHub iOS Client"]
         let tabBar = app.tabBars.firstMatch
         
-        XCTAssertTrue(loginTitle.exists || tabBar.exists, "应用应该显示登录页面或主界面")
+        XCTAssertTrue(loginTitle.exists || tabBar.exists, "App should display login page or main interface")
         
-        // 检查应用是否响应交互
+        // Check if the app responds to interaction
         if tabBar.exists {
-            // 找到主页标签（可能是第一个按钮，也可能需要通过名称查找）
-            let homeTabNames = ["主页", "Home", "首页", "发现"]
+            // Find home tab (could be the first button, or may need to search by name)
+            let homeTabNames = ["Home", "Homepage", "Discover", "Main"]
             var homeTab: XCUIElement? = nil
             
-            // 尝试通过名称查找主页标签
+            // Try to find home tab by name
             for name in homeTabNames {
                 let tab = tabBar.buttons[name]
                 if tab.exists {
@@ -49,38 +49,38 @@ final class GitHubUITestsLaunchTests: XCTestCase {
                 }
             }
             
-            // 如果没找到，使用第一个标签页
+            // If not found, use the first tab
             if homeTab == nil {
                 homeTab = tabBar.buttons.element(boundBy: 0)
             }
             
             homeTab?.tap()
             
-            // 等待页面加载
+            // Wait for page to load
             sleep(2)
             
-            // 检查多种可能的内容容器
+            // Check various possible content containers
             let contentExists = app.collectionViews.firstMatch.exists || 
                                app.tables.firstMatch.exists ||
                                app.scrollViews.firstMatch.exists ||
                                app.staticTexts.count > 1
             
-            XCTAssertTrue(contentExists, "主页内容应该加载")
+            XCTAssertTrue(contentExists, "Homepage content should load")
             
-            // 如果上面的检查失败，打印UI调试信息
+            // If above checks fail, print UI debug information
             if !contentExists {
-                print("当前UI层次结构:")
+                print("Current UI hierarchy:")
                 print(app.debugDescription)
             }
         }
 
-        // 截取启动屏幕截图
+        // Take launch screen screenshot
         let attachment = XCTAttachment(screenshot: app.screenshot())
         attachment.name = "Launch Screen"
         attachment.lifetime = .keepAlways
         add(attachment)
         
-        // 添加设备信息
+        // Add device information
         let deviceInfo = """
         Device: \(UIDevice.current.name)
         iOS Version: \(UIDevice.current.systemVersion)
@@ -95,27 +95,27 @@ final class GitHubUITestsLaunchTests: XCTestCase {
     
     @MainActor
     func testAppIcon() throws {
-        // 验证应用图标是否存在于主屏幕
-        // 注意：这个测试可能需要特殊权限，可能在某些环境中不工作
+        // Verify app icon exists on home screen
+        // Note: This test may require special permissions and might not work in some environments
         
         let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
         
-        // 尝试在主屏幕上找到应用图标
+        // Try to find app icon on home screen
         let appIcon = springboard.icons["GitHub"]
         
         if appIcon.exists {
-            // 截图应用图标
+            // Screenshot app icon
             let attachment = XCTAttachment(screenshot: appIcon.screenshot())
             attachment.name = "App Icon"
             attachment.lifetime = .keepAlways
             add(attachment)
         }
         
-        // 启动应用
+        // Launch app
         let app = XCUIApplication()
         app.launch()
         
-        // 验证应用是否成功启动
-        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 5), "应用应该在前台运行")
+        // Verify app launches successfully
+        XCTAssertTrue(app.wait(for: .runningForeground, timeout: 5), "App should be running in foreground")
     }
 }

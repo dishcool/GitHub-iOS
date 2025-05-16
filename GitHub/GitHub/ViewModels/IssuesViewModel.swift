@@ -33,7 +33,7 @@ class IssuesViewModel: ObservableObject {
                 }
             } catch {
                 await MainActor.run {
-                    self.errorMessage = "加载Issues失败: \(error.localizedDescription)"
+                    self.errorMessage = "Failed to load issues: \(error.localizedDescription)"
                     self.isLoading = false
                 }
             }
@@ -53,7 +53,7 @@ class IssuesViewModel: ObservableObject {
                 }
             } catch {
                 await MainActor.run {
-                    self.errorMessage = "加载Issue详情失败: \(error.localizedDescription)"
+                    self.errorMessage = "Failed to load issue details: \(error.localizedDescription)"
                     self.isLoading = false
                 }
             }

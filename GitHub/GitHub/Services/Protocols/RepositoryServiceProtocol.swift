@@ -14,13 +14,13 @@ protocol RepositoryServiceProtocol {
     func searchRepositories(query: String, page: Int, perPage: Int, useCache: Bool, completion: @escaping (Result<[Repository], Error>) -> Void)
     func fetchRepositoryReadme(owner: String, name: String, completion: @escaping (Result<String, Error>) -> Void)
     
-    // 清除所有缓存
+    // Clear all caches
     func clearCache()
-    // 清除特定类型的缓存
+    // Clear a specific type of cache
     func clearCache(forType: CacheType)
 }
 
-// 缓存类型枚举
+// Cache type enumeration
 enum CacheType {
     case trending
     case userRepositories(username: String)

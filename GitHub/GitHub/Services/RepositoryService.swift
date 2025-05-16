@@ -7,7 +7,7 @@
 
 import Foundation
 
-// 删除typealias并直接使用NetworkServiceProtocol
+// Removed typealias and directly use NetworkServiceProtocol
 
 class RepositoryService: RepositoryServiceProtocol {
     private let networkService: NetworkServiceProtocol
@@ -17,10 +17,10 @@ class RepositoryService: RepositoryServiceProtocol {
     }
     
     public func getTrendingRepositories(language: String? = nil, timeSpan: String? = nil, useCache: Bool = true, completion: @escaping (Result<[Repository], Error>) -> Void) {
-        // 构建查询字符串
+        // Build query string
         var query = "stars:>100"
         
-        // 添加创建时间筛选
+        // Add creation time filter
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
         
@@ -41,15 +41,15 @@ class RepositoryService: RepositoryServiceProtocol {
         let dateString = dateFormatter.string(from: date)
         query += " created:>\(dateString)"
         
-        // 添加语言筛选
+        // Add language filter
         if let language = language, !language.isEmpty {
             query += " language:\(language)"
         }
         
-        // URL编码查询字符串
+        // URL encode the query string
         let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? query
         
-        // 构建完整URL
+        // Build complete URL
         let endpoint = "https://api.github.com/search/repositories?q=\(encodedQuery)&sort=stars&order=desc"
         
         networkService.request(endpoint: endpoint, method: .get, parameters: nil, headers: nil, useCache: useCache) { (result: Result<SearchRepositoriesResponse, Error>) in
@@ -119,16 +119,16 @@ class RepositoryService: RepositoryServiceProtocol {
         }
     }
     
-    // 清除所有缓存
+    // Clear all caches
     func clearCache() {
         networkService.clearCache()
     }
     
-    // 清除特定类型的缓存
+    // Clear a specific type of cache
     func clearCache(forType: CacheType) {
         switch forType {
         case .trending:
-            // 由于trending缓存键可能有多种（不同语言和时间范围），此处简化处理
+            // Since trending cache keys might have multiple variations (different languages and time ranges), simplified handling here
             networkService.clearCache(for: "https://api.github.com/search/repositories")
         case .userRepositories(let username):
             networkService.clearCache(for: "https://api.github.com/users/\(username)/repos")

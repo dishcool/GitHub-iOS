@@ -10,8 +10,8 @@ import Alamofire
 import SwiftyJSON
 
 class NetworkService: NetworkServiceProtocol {
-    // 你可以在这里设置你的GitHub Personal Access Token
-    // 如果没有，可以通过 https://github.com/settings/tokens 创建一个
+    // You can set your GitHub Personal Access Token here
+    // If you don't have one, you can create it via https://github.com/settings/tokens
     private let githubToken: String? = "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"
     
     private var defaultHeaders: [String: String] {
@@ -19,7 +19,7 @@ class NetworkService: NetworkServiceProtocol {
             "Accept": "application/json"
         ]
         
-        // 如果有认证令牌，添加到请求头
+        // If there's an authentication token, add it to the request headers
         if let token = githubToken, !token.isEmpty {
             headers["Authorization"] = "token \(token)"
         }
@@ -27,19 +27,19 @@ class NetworkService: NetworkServiceProtocol {
         return headers
     }
     
-    // 简单的内存缓存，用于缓存GET请求的响应
+    // Simple in-memory cache for caching GET request responses
     private var cache = NSCache<NSString, CacheEntry>()
     
-    // 缓存有效期（秒）
-    private let cacheTTL: TimeInterval = 300 // 5分钟
+    // Cache time-to-live (seconds)
+    private let cacheTTL: TimeInterval = 300 // 5 minutes
     
     private let session: Session
     
     init(session: Session = .default) {
         self.session = session
         
-        // 配置缓存
-        cache.countLimit = 100 // 最多缓存100个请求
+        // Configure cache
+        cache.countLimit = 100 // Cache at most 100 requests
     }
     
     func request<T: Decodable>(
@@ -55,26 +55,26 @@ class NetworkService: NetworkServiceProtocol {
             return
         }
         
-        // 对于GET请求，尝试从缓存获取
+        // For GET requests, try to retrieve from cache
         if method == .get && useCache {
             let cacheKey = NSString(string: endpoint + (parameters?.description ?? ""))
             
             if let cachedResponse = cache.object(forKey: cacheKey) {
-                // 检查缓存是否过期
+                // Check if cache is expired
                 if Date().timeIntervalSince(cachedResponse.timestamp) < cacheTTL {
                     do {
-                        // 尝试从缓存解码
+                        // Try to decode from cache
                         let decodedObject = try JSONDecoder().decode(T.self, from: cachedResponse.data)
                         print("🧩 Using cached response for: \(endpoint)")
                         completion(.success(decodedObject))
                         return
                     } catch {
                         print("⚠️ Failed to decode cached response: \(error)")
-                        // 缓存解码失败，继续请求网络
+                        // Cache decoding failed, continue with network request
                     }
                 } else {
                     print("⏱️ Cache expired for: \(endpoint)")
-                    // 缓存过期，继续请求网络
+                    // Cache expired, continue with network request
                 }
             }
         }
@@ -98,13 +98,13 @@ class NetworkService: NetworkServiceProtocol {
         ).responseData { response in
             switch response.result {
             case .success(let data):
-                // 显示剩余的API请求配额
-                if let remainingHeader = response.response?.headers.value(for: "X-RateLimit-Remaining"),
-                   let limitHeader = response.response?.headers.value(for: "X-RateLimit-Limit") {
-                    print("📊 Rate Limit: \(remainingHeader)/\(limitHeader) requests remaining")
-                }
+                // Log response details
+                let statusCode = response.response?.statusCode ?? 0
+                let rateLimitRemaining = response.response?.allHeaderFields["X-RateLimit-Remaining"] as? String ?? "Unknown"
+                let rateLimitReset = response.response?.allHeaderFields["X-RateLimit-Reset"] as? String ?? "Unknown"
                 
-                print("📥 Response Status Code: \(response.response?.statusCode ?? 0)")
+                // Display remaining API request quota
+                print("[Network] Response: \(statusCode), Rate Limit Remaining: \(rateLimitRemaining), Reset: \(rateLimitReset)")
                 
                 if let string = String(data: data, encoding: .utf8) {
                     print("📄 Response Data: \(string.prefix(500))...")
@@ -142,11 +142,13 @@ class NetworkService: NetworkServiceProtocol {
                 do {
                     let decodedObject = try JSONDecoder().decode(T.self, from: data)
                     
-                    // 对于GET请求，缓存响应
-                    if method == .get && useCache {
-                        let cacheKey = NSString(string: endpoint + (parameters?.description ?? ""))
-                        let entry = CacheEntry(data: data, timestamp: Date())
-                        self.cache.setObject(entry, forKey: cacheKey)
+                    // Cache data for future use
+                    if let response = response.response, 
+                       200...299 ~= response.statusCode,
+                       method == .get {
+                        
+                        // For GET requests, cache the response
+                        self.cache.setObject(CacheEntry(data: data, timestamp: Date()), forKey: NSString(string: url.absoluteString))
                         print("💾 Cached response for: \(endpoint)")
                     }
                     
@@ -180,13 +182,13 @@ class NetworkService: NetworkServiceProtocol {
         }
     }
     
-    // 清除所有缓存
+    // Clear all caches
     func clearCache() {
         cache.removeAllObjects()
         print("🧹 Cleared all cached responses")
     }
     
-    // 清除特定端点的缓存
+    // Clear cache for a specific endpoint
     func clearCache(for endpoint: String) {
         let cacheKey = NSString(string: endpoint)
         cache.removeObject(forKey: cacheKey)
@@ -194,7 +196,7 @@ class NetworkService: NetworkServiceProtocol {
     }
 }
 
-/// 缓存条目类，用于保存缓存的数据和时间戳
+/// Cache entry class for storing cached data and timestamps
 class CacheEntry {
     let data: Data
     let timestamp: Date

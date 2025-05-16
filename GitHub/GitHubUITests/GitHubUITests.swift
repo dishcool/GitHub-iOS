@@ -8,7 +8,7 @@
 import XCTest
 import UIKit
 
-// 添加 XCUIDevice 扩展，以便切换深色/浅色模式
+// Add XCUIDevice extension to switch between light/dark mode
 @available(iOS 13.0, *)
 extension XCUIDevice {
     enum AppearanceMode: String {
@@ -17,25 +17,25 @@ extension XCUIDevice {
     }
     
     func setAppearance(_ appearance: AppearanceMode) {
-        // 这个方法尝试通过改变设备方向来触发界面重绘
-        // 注意：这个方法不能直接切换深色/浅色模式，只是一种尝试触发UI重绘的方法
+        // This method attempts to trigger UI redraw by changing device orientation
+        // Note: This method cannot directly switch between light/dark mode, it's just an attempt to trigger UI redraw
         
-        // 获取当前设备方向
+        // Get current device orientation
         let currentOrientation = UIDevice.current.orientation
         
-        // 旋转到与当前方向不同的方向
+        // Rotate to a different orientation
         let newOrientation: UIDeviceOrientation = currentOrientation.isPortrait ? .landscapeLeft : .portrait
         
-        // 使用 KVO 方式改变方向
+        // Use KVO to change orientation
         UIDevice.current.setValue(newOrientation.rawValue, forKey: "orientation")
         
-        // 强制UI更新
+        // Force UI update
         RunLoop.current.run(until: Date(timeIntervalSinceNow: 0.5))
         
-        // 旋转回原来的方向
+        // Rotate back to original orientation
         UIDevice.current.setValue(currentOrientation.rawValue, forKey: "orientation")
         
-        // 强制UI更新
+        // Force UI update
         RunLoop.current.run(until: Date(timeIntervalSinceNow: 0.5))
     }
 }
@@ -50,7 +50,7 @@ final class GitHubUITests: XCTestCase {
         // In UI tests it is usually best to stop immediately when a failure occurs.
         continueAfterFailure = false
 
-        // 在每次测试前启动应用
+        // Launch the application before each test
         app.launch()
     }
 
@@ -59,120 +59,120 @@ final class GitHubUITests: XCTestCase {
         app.terminate()
     }
 
-    // MARK: - 登录界面测试
+    // MARK: - Login Screen Tests
     
     @MainActor
     func testLoginScreenElements() throws {
-        // 导航到登录页面
-        XCTAssertTrue(navigateToLoginScreen(), "应该能够成功导航到登录页面")
+        // Navigate to login page
+        XCTAssertTrue(navigateToLoginScreen(), "Should be able to navigate to login screen successfully")
         
-        // 验证登录界面的基本元素是否存在
-        XCTAssertTrue(app.staticTexts["GitHub iOS客户端"].exists, "应用标题应该存在")
-        XCTAssertTrue(app.staticTexts["探索GitHub的世界"].exists, "应用副标题应该存在")
-        XCTAssertTrue(app.images["globe"].exists, "应用图标应该存在")
+        // Verify basic elements of the login interface exist
+        XCTAssertTrue(app.staticTexts["GitHub iOS Client"].exists, "App title should exist")
+        XCTAssertTrue(app.staticTexts["Explore the GitHub World"].exists, "App subtitle should exist")
+        XCTAssertTrue(app.images["globe"].exists, "App icon should exist")
         
-        // 验证登录按钮是否存在（根据实际情况，可能是GitHub账号登录或生物识别登录）
-        let loginButton = app.buttons.matching(NSPredicate(format: "label CONTAINS '登录'")).firstMatch
-        XCTAssertTrue(loginButton.exists, "登录按钮应该存在")
+        // Verify login button exists (depending on actual implementation, might be GitHub account login or biometric login)
+        let loginButton = app.buttons.matching(NSPredicate(format: "label CONTAINS 'Login'")).firstMatch
+        XCTAssertTrue(loginButton.exists, "Login button should exist")
     }
     
     @MainActor
     func testNavigateToHomeWithoutLogin() throws {
-        // 验证未登录用户可以访问主页
-        // 查找主页标签
-        let homeTabNames = ["主页", "Home", "首页", "发现"]
+        // Verify non-logged in users can access homepage
+        // Find home tab
+        let homeTabNames = ["Home", "Homepage", "Discover", "Main"]
         guard let homeTab = findTabByName(names: homeTabNames) else {
-            XCTFail("未能找到主页标签")
+            XCTFail("Could not find home tab")
             return
         }
         
         homeTab.tap()
         
-        // 打印当前UI状态，帮助调试
-        print("点击主页标签后的UI状态")
+        // Print current UI state for debugging
+        print("UI state after clicking home tab")
         printUIHierarchy()
         
-        // 准备可能的仓库列表元素
+        // Prepare possible repository list elements
         let possibleListElements = [
             app.collectionViews.firstMatch,
             app.tables.firstMatch,
             app.scrollViews.firstMatch
         ]
         
-        // 等待任意一个列表元素出现
+        // Wait for any of the list elements to appear
         if let foundElement = waitForAnyElement(possibleListElements, timeout: 8.0) {
-            print("找到仓库列表元素: \(foundElement.elementType)")
-            XCTAssertTrue(true, "找到仓库列表")
+            print("Found repository list element: \(foundElement.elementType)")
+            XCTAssertTrue(true, "Found repository list")
             
-            // 检查列表是否有内容
+            // Check if the list has content
             if foundElement.elementType == .collectionView {
                 let cells = app.collectionViews.firstMatch.cells
-                print("CollectionView 单元格数量: \(cells.count)")
-                // 不强制要求有内容，因为可能是空状态
+                print("CollectionView cell count: \(cells.count)")
+                // No requirement to have content, as it might be empty state
             } else if foundElement.elementType == .table {
                 let cells = app.tables.firstMatch.cells
-                print("TableView 单元格数量: \(cells.count)")
-                // 不强制要求有内容，因为可能是空状态
+                print("TableView cell count: \(cells.count)")
+                // No requirement to have content, as it might be empty state
             }
         } else {
-            // 如果找不到列表元素，检查是否有加载指示器或空状态视图
+            // If no list elements are found, check if there's a loading indicator or empty state view
             let loadingIndicator = app.activityIndicators.firstMatch
-            let emptyStateTexts = app.staticTexts.matching(NSPredicate(format: "label CONTAINS '暂无' OR label CONTAINS '空' OR label CONTAINS 'Empty' OR label CONTAINS 'No'")).firstMatch
+            let emptyStateTexts = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Empty' OR label CONTAINS 'No' OR label CONTAINS 'Not' OR label CONTAINS 'Nothing'")).firstMatch
             
             if loadingIndicator.exists {
-                print("发现加载指示器，内容可能正在加载")
-                XCTAssertTrue(true, "发现加载指示器，内容可能正在加载")
+                print("Found loading indicator, content might be loading")
+                XCTAssertTrue(true, "Found loading indicator, content might be loading")
             } else if emptyStateTexts.exists {
-                print("发现空状态文本: \(emptyStateTexts.label)")
-                XCTAssertTrue(true, "发现空状态视图")
+                print("Found empty state text: \(emptyStateTexts.label)")
+                XCTAssertTrue(true, "Found empty state view")
             } else {
-                // 检查是否有任何与仓库相关的文本
-                let repoTexts = app.staticTexts.matching(NSPredicate(format: "label CONTAINS '仓库' OR label CONTAINS 'Repository' OR label CONTAINS 'Repo'")).allElementsBoundByIndex
+                // Check if there's any text related to repositories
+                let repoTexts = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Repository' OR label CONTAINS 'Repo'")).allElementsBoundByIndex
                 
                 if !repoTexts.isEmpty {
-                    print("找到与仓库相关的文本: \(repoTexts.map { $0.label })")
-                    XCTAssertTrue(true, "找到与仓库相关的文本")
+                    print("Found repository-related text: \(repoTexts.map { $0.label })")
+                    XCTAssertTrue(true, "Found repository-related text")
                 } else {
-                    // 如果什么都没找到，打印所有可见的文本元素，帮助调试
+                    // If nothing is found, print all visible text elements for debugging
                     let allTexts = app.staticTexts.allElementsBoundByIndex.map { $0.label }
-                    print("页面上的所有文本: \(allTexts)")
+                    print("All text on the page: \(allTexts)")
                     
-                    // 最后尝试查找任何可能的内容容器
+                    // Finally, try to find any possible content container
                     if app.otherElements.count > 0 {
-                        print("页面上有 \(app.otherElements.count) 个其他元素")
-                        XCTAssertTrue(true, "页面上有其他UI元素，可能包含仓库列表")
+                        print("Page has \(app.otherElements.count) other elements")
+                        XCTAssertTrue(true, "Page has other UI elements, possibly containing repository list")
                     } else {
-                        XCTFail("未能找到任何可能的仓库列表或相关内容")
+                        XCTFail("Could not find any possible repository list or related content")
                     }
                 }
             }
         }
         
-        // 打印最终UI状态
-        print("最终UI状态")
+        // Print final UI state
+        print("Final UI state")
         printUIHierarchy()
     }
     
-    // MARK: - 搜索功能测试
+    // MARK: - Search Function Tests
     
     @MainActor
     func testSearchRepository() throws {
-        // 1. 导航到搜索页面
-        let searchTabNames = ["搜索", "Search", "查找"]
+        // 1. Navigate to search page
+        let searchTabNames = ["Search", "Search", "Find"]
         guard let searchTab = findTabByName(names: searchTabNames) else {
-            XCTFail("未能找到搜索标签")
+            XCTFail("Could not find search tab")
             return
         }
         
         searchTab.tap()
         sleep(1)
         
-        // 2. 查找并点击搜索框或搜索入口
+        // 2. Find and tap search field or search entry
         var searchField = app.textFields.firstMatch
         
-        // 如果没有直接找到搜索框，尝试先点击搜索按钮
+        // If search field is not found directly, try tapping search button first
         if !searchField.exists {
-            let searchButton = app.buttons.matching(NSPredicate(format: "label CONTAINS '搜索' OR label CONTAINS 'Search'")).firstMatch
+            let searchButton = app.buttons.matching(NSPredicate(format: "label CONTAINS 'Search' OR label CONTAINS 'Search'")).firstMatch
             
             if searchButton.exists {
                 searchButton.tap()
@@ -181,104 +181,104 @@ final class GitHubUITests: XCTestCase {
             }
         }
         
-        // 确保找到了搜索框
+        // Ensure search field is found
         guard searchField.exists else {
             printUIHierarchy()
-            XCTFail("未能找到搜索框")
+            XCTFail("Could not find search field")
             return
         }
         
-        // 3. 执行搜索操作
+        // 3. Perform search operation
         searchField.tap()
         searchField.typeText("swift")
         
-        // 尝试点击键盘上的搜索按钮，如果不存在则使用回车键
+        // Try tapping the search button on the keyboard, if it doesn't exist use return key
         if app.keyboards.buttons["search"].exists {
             app.keyboards.buttons["search"].tap()
         } else if app.keyboards.buttons["return"].exists {
             app.keyboards.buttons["return"].tap()
         } else {
-            // 使用回车键完成搜索
+            // Use return key to complete search
             app.typeText("\n")
         }
         
-        // 4. 等待并验证搜索结果
+        // 4. Wait and verify search results
         sleep(2)
         
-        // 在SwiftUI中，列表可能被渲染为这些元素之一
+        // In SwiftUI, list might be rendered as one of these elements
         let hasResultView = app.scrollViews.firstMatch.exists || 
                           app.collectionViews.firstMatch.exists || 
                           app.tables.firstMatch.exists
         
-        // 检查是否有任何静态文本（可能是结果或"无结果"消息）
+        // Check if there's any static text (might be result or "No Result" message)
         let hasText = !app.staticTexts.allElementsBoundByIndex.isEmpty
         
-        // 如果测试失败，打印UI层次结构以帮助调试
+        // If test fails, print UI hierarchy for debugging
         if !(hasResultView || hasText) {
             printUIHierarchy()
         }
         
-        // 断言页面上应该有结果视图或至少有一些文本
-        XCTAssertTrue(hasResultView || hasText, "搜索后应该显示结果列表或提示信息")
+        // Assert that there should be a result view or at least some text
+        XCTAssertTrue(hasResultView || hasText, "Search should display result list or prompt information")
     }
     
-    // MARK: - 仓库详情测试
+    // MARK: - Repository Details Tests
     
     @MainActor
     func testRepositoryDetails() throws {
-        // 导航到主页
-        let homeTabNames = ["主页", "Home", "首页", "发现"]
+        // Navigate to homepage
+        let homeTabNames = ["Home", "Homepage", "Discover", "Main"]
         guard let homeTab = findTabByName(names: homeTabNames) else {
-            XCTFail("未能找到主页标签")
+            XCTFail("Could not find home tab")
             return
         }
         
         homeTab.tap()
         
-        // 打印当前UI状态，帮助调试
-        print("点击主页标签后的UI状态")
+        // Print current UI state for debugging
+        print("UI state after clicking home tab")
         printUIHierarchy()
         
-        // 准备可能的仓库列表元素
+        // Prepare possible repository list elements
         let possibleListElements = [
             app.collectionViews.firstMatch,
             app.tables.firstMatch,
             app.scrollViews.firstMatch
         ]
         
-        // 等待任意一个列表元素出现
+        // Wait for any of the list elements to appear
         guard let listElement = waitForAnyElement(possibleListElements, timeout: 8.0) else {
-            XCTFail("未能找到仓库列表")
+            XCTFail("Could not find repository list")
             return
         }
         
-        print("找到仓库列表元素: \(listElement.elementType)")
+        print("Found repository list element: \(listElement.elementType)")
         
-        // 检查列表是否有内容
+        // Check if the list has content
         var hasCells = false
         var firstCell: XCUIElement?
         
         if listElement.elementType == .collectionView {
             let cells = app.collectionViews.firstMatch.cells
-            print("CollectionView 单元格数量: \(cells.count)")
+            print("CollectionView cell count: \(cells.count)")
             hasCells = cells.count > 0
             if hasCells {
                 firstCell = cells.element(boundBy: 0)
             }
         } else if listElement.elementType == .table {
             let cells = app.tables.firstMatch.cells
-            print("TableView 单元格数量: \(cells.count)")
+            print("TableView cell count: \(cells.count)")
             hasCells = cells.count > 0
             if hasCells {
                 firstCell = cells.element(boundBy: 0)
             }
         } else if listElement.elementType == .scrollView {
-            // 在滚动视图中查找可点击的元素
+            // Find clickable elements in scroll view
             let buttons = listElement.buttons.allElementsBoundByIndex
             let staticTexts = listElement.staticTexts.allElementsBoundByIndex
             
-            print("ScrollView 中的按钮数量: \(buttons.count)")
-            print("ScrollView 中的文本数量: \(staticTexts.count)")
+            print("Button count in ScrollView: \(buttons.count)")
+            print("Text count in ScrollView: \(staticTexts.count)")
             
             if buttons.count > 0 {
                 firstCell = buttons.first
@@ -290,34 +290,34 @@ final class GitHubUITests: XCTestCase {
         }
         
         guard hasCells, let cellToTap = firstCell else {
-            XCTFail("仓库列表为空或无法找到可点击的元素")
+            XCTFail("Repository list is empty or could not find clickable element")
             return
         }
         
-        // 点击第一个仓库
-        print("点击第一个仓库: \(cellToTap.description)")
+        // Tap first repository
+        print("Tapping first repository: \(cellToTap.description)")
         cellToTap.tap()
         
-        // 等待仓库详情页面加载
+        // Wait for repository details page to load
         sleep(2)
         
-        // 打印当前UI状态，帮助调试
-        print("点击仓库后的UI状态")
+        // Print current UI state for debugging
+        print("UI state after clicking repository")
         printUIHierarchy()
         
-        // 验证仓库详情页面元素
-        // 尝试多种可能的元素来确认我们在仓库详情页面
+        // Verify repository details page elements
+        // Try multiple possible elements to confirm we're on repository details page
         
-        // 检查是否有仓库名称
+        // Check if there's repository name
         let repoNameElements = app.staticTexts.allElementsBoundByIndex.filter { 
-            !$0.label.isEmpty && $0.label != "返回" && $0.label != "Back"
+            !$0.label.isEmpty && $0.label != "Back" && $0.label != "Back"
         }
         
         if !repoNameElements.isEmpty {
-            print("找到可能的仓库名称: \(repoNameElements.first?.label ?? "")")
+            print("Found possible repository name: \(repoNameElements.first?.label ?? "")")
         }
         
-        // 检查是否有README内容
+        // Check if there's README content
         let possibleReadmeElements = [
             app.scrollViews.firstMatch,
             app.webViews.firstMatch,
@@ -325,98 +325,98 @@ final class GitHubUITests: XCTestCase {
         ]
         
         if let readmeElement = waitForAnyElement(possibleReadmeElements, timeout: 5.0) {
-            print("找到可能的README内容元素: \(readmeElement.elementType)")
-            XCTAssertTrue(true, "找到README内容")
+            print("Found possible README content element: \(readmeElement.elementType)")
+            XCTAssertTrue(true, "Found README content")
         } else {
-            // 如果找不到README，检查是否有其他仓库详情元素
+            // If README is not found, check if there's any other repository details element
             let detailTexts = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Star' OR label CONTAINS 'Fork' OR label CONTAINS 'Issue' OR label CONTAINS 'Pull' OR label CONTAINS 'Code' OR label CONTAINS 'README'")).allElementsBoundByIndex
             
             if !detailTexts.isEmpty {
-                print("找到仓库详情相关文本: \(detailTexts.map { $0.label })")
-                XCTAssertTrue(true, "找到仓库详情相关文本")
+                print("Found repository details related text: \(detailTexts.map { $0.label })")
+                XCTAssertTrue(true, "Found repository details related text")
             } else {
-                // 最后检查是否有加载指示器
+                // Finally, check if there's a loading indicator
                 if app.activityIndicators.firstMatch.exists {
-                    print("内容可能正在加载中")
-                    XCTAssertTrue(true, "内容正在加载中")
+                    print("Content might be loading")
+                    XCTAssertTrue(true, "Content is loading")
                 } else {
-                    // 打印所有可见的文本元素，帮助调试
+                    // Print all visible text elements for debugging
                     let allTexts = app.staticTexts.allElementsBoundByIndex.map { $0.label }
-                    print("页面上的所有文本: \(allTexts)")
+                    print("All text on the page: \(allTexts)")
                     
-                    XCTFail("未能找到任何仓库详情页面元素")
+                    XCTFail("Could not find any repository details page elements")
                 }
             }
         }
     }
     
-    // MARK: - 深色模式测试
+    // MARK: - Dark Mode Tests
     
     @MainActor
     func testDarkModeTransition() throws {
-        // 注意：此测试需要iOS 13+
+        // Note: This test requires iOS 13+
         if #available(iOS 13.0, *) {
-            // 导航到主页或应用的某个稳定页面
-            let homeTabNames = ["主页", "Home", "首页", "发现"]
+            // Navigate to homepage or a stable page of the app
+            let homeTabNames = ["Home", "Homepage", "Discover", "Main"]
             guard let homeTab = findTabByName(names: homeTabNames) else {
-                XCTFail("未能找到主页标签")
+                XCTFail("Could not find home tab")
                 return
             }
             
             homeTab.tap()
             sleep(2)
             
-            // 截取当前模式的屏幕截图（通常是竖屏模式）
+            // Take screenshot of current mode (usually portrait mode)
             let portraitScreenshot = app.screenshot()
             let portraitAttachment = XCTAttachment(screenshot: portraitScreenshot)
             portraitAttachment.name = "Portrait Mode"
             portraitAttachment.lifetime = .keepAlways
             add(portraitAttachment)
             
-            // 使用标准的方式改变设备方向
-            // 不要直接使用 rotate(to:) 方法，它可能在不同版本的 XCTest 中有变化
+            // Use standard way to change device orientation
+            // Do not directly use rotate(to:) method, it might vary between different versions of XCTest
             let newOrientation = UIDeviceOrientation.landscapeLeft
             UIDevice.current.setValue(newOrientation.rawValue, forKey: "orientation")
             
-            // 强制UI更新
-            // 这一步很重要，确保方向变化生效
+            // Force UI update
+            // This step is important to ensure direction change takes effect
             RunLoop.current.run(until: Date(timeIntervalSinceNow: 1))
             
-            // 等待界面适应新方向
+            // Wait for interface to adapt to new direction
             sleep(2)
             
-            // 截取横屏模式的屏幕截图
+            // Take screenshot of landscape mode
             let landscapeScreenshot = app.screenshot()
             let landscapeAttachment = XCTAttachment(screenshot: landscapeScreenshot)
             landscapeAttachment.name = "Landscape Mode"
             landscapeAttachment.lifetime = .keepAlways
             add(landscapeAttachment)
             
-            // 切换回竖屏模式
+            // Switch back to portrait mode
             UIDevice.current.setValue(UIDeviceOrientation.portrait.rawValue, forKey: "orientation")
             
-            // 强制UI更新
+            // Force UI update
             RunLoop.current.run(until: Date(timeIntervalSinceNow: 1))
             
-            // 等待界面适应回竖屏
+            // Wait for interface to adapt back to portrait
             sleep(2)
             
-            // 截取回到竖屏后的屏幕截图
+            // Take screenshot of back to portrait mode
             let backToPortraitScreenshot = app.screenshot()
             let backToPortraitAttachment = XCTAttachment(screenshot: backToPortraitScreenshot)
             backToPortraitAttachment.name = "Back to Portrait Mode"
             backToPortraitAttachment.lifetime = .keepAlways
             add(backToPortraitAttachment)
             
-            // 验证测试
-            XCTAssertTrue(true, "设备旋转测试完成，请在测试报告中查看截图")
+            // Verify test
+            XCTAssertTrue(true, "Device rotation test completed, please check screenshots in test report")
             
-            // 注：此测试主要是检查应用在不同屏幕方向上的表现
-            // 这对验证深色模式适配也很有用，因为屏幕旋转通常会触发界面重绘
+            // Note: This test is mainly to check app's performance on different screen directions
+            // It's also useful for verifying dark mode adaptation, because screen rotation usually triggers UI redraw
         }
     }
     
-    // MARK: - 性能测试
+    // MARK: - Performance Tests
     
     @MainActor
     func testLaunchPerformance() throws {
@@ -428,19 +428,19 @@ final class GitHubUITests: XCTestCase {
         }
     }
     
-    // MARK: - 辅助方法
+    // MARK: - Helper Methods
     
-    /// 打印UI层次结构，便于调试
+    /// Print UI hierarchy for debugging
     func printUIHierarchy() {
-        print("当前UI层次结构:")
+        print("Current UI hierarchy:")
         print(app.debugDescription)
     }
     
-    /// 等待特定UI元素出现
+    /// Wait for specific UI element to appear
     /// - Parameters:
-    ///   - element: 要等待的UI元素
-    ///   - timeout: 超时时间（秒）
-    /// - Returns: 等待是否成功
+    ///   - element: UI element to wait for
+    ///   - timeout: Timeout time (seconds)
+    /// - Returns: Wait success
     func waitForElement(_ element: XCUIElement, timeout: TimeInterval = 5.0) -> Bool {
         let predicate = NSPredicate(format: "exists == true")
         let expectation = XCTNSPredicateExpectation(predicate: predicate, object: element)
@@ -448,11 +448,11 @@ final class GitHubUITests: XCTestCase {
         return result == .completed
     }
     
-    /// 等待任意一个元素出现
+    /// Wait for any of the elements to appear
     /// - Parameters:
-    ///   - elements: 要等待的UI元素数组
-    ///   - timeout: 超时时间（秒）
-    /// - Returns: 第一个出现的元素，如果都没出现则返回nil
+    ///   - elements: UI elements array to wait for
+    ///   - timeout: Timeout time (seconds)
+    /// - Returns: First appearing element, if none appear returns nil
     func waitForAnyElement(_ elements: [XCUIElement], timeout: TimeInterval = 5.0) -> XCUIElement? {
         let startTime = Date()
         
@@ -468,170 +468,170 @@ final class GitHubUITests: XCTestCase {
         return nil
     }
     
-    /// 查找指定名称的标签页
-    /// - Parameter names: 可能的标签名称数组
-    /// - Returns: 找到的标签页元素，如果没找到则返回nil
+    /// Find tab by name
+    /// - Parameter names: Possible tab names array
+    /// - Returns: Found tab element, if not found returns nil
     func findTabByName(names: [String]) -> XCUIElement? {
         let tabBar = app.tabBars.firstMatch
         guard tabBar.exists else {
-            print("未找到标签栏")
+            print("Could not find tab bar")
             return nil
         }
         
-        // 打印所有可用标签
+        // Print all available tabs
         let allTabs = tabBar.buttons.allElementsBoundByIndex
-        print("所有可用标签: \(allTabs.map { $0.label })")
+        print("All available tabs: \(allTabs.map { $0.label })")
         
-        // 尝试精确匹配
+        // Try exact match
         for name in names {
             let tab = tabBar.buttons[name]
             if tab.exists {
-                print("通过精确名称找到标签: \(name)")
+                print("Found tab by exact name: \(name)")
                 return tab
             }
         }
         
-        // 尝试部分匹配
+        // Try partial match
         for tab in allTabs {
             let label = tab.label.lowercased()
             for name in names {
                 if label.contains(name.lowercased()) {
-                    print("通过部分匹配找到标签: \(tab.label) (匹配: \(name))")
+                    print("Found tab by partial match: \(tab.label) (matched: \(name))")
                     return tab
                 }
             }
         }
         
-        print("未能找到任何匹配的标签: \(names)")
+        print("Could not find any matching tab: \(names)")
         return nil
     }
     
-    /// 导航到登录页面
+    /// Navigate to login page
     func navigateToLoginScreen() -> Bool {
-        // 打印初始UI状态
-        print("开始导航到登录页面")
+        // Print initial UI state
+        print("Starting navigation to login page")
         printUIHierarchy()
         
-        // 查找个人资料标签
-        let profileTabNames = ["我的", "个人", "Profile", "Me", "User", "账户", "Account"]
+        // Find profile tab
+        let profileTabNames = ["My", "Personal", "Profile", "Me", "User", "Account", "Account"]
         guard let profileTab = findTabByName(names: profileTabNames) else {
-            XCTFail("未能找到个人资料/我的标签")
+            XCTFail("Could not find personal/my tab")
             return false
         }
         
-        // 点击个人资料标签
+        // Tap personal tab
         profileTab.tap()
         
-        // 等待一下让页面加载
+        // Wait for a moment for page to load
         sleep(1)
         
-        // 打印点击个人资料标签后的UI状态
-        print("点击个人资料标签后的UI状态")
+        // Print UI state after clicking personal tab
+        print("UI state after clicking personal tab")
         printUIHierarchy()
         
-        // 查找并点击登录按钮或入口
-        let loginButtonLabels = ["登录", "Login", "Sign In", "登录GitHub", "登录账号", "登录账户"]
+        // Find and tap login button or entry
+        let loginButtonLabels = ["Login", "Login", "Sign In", "Login GitHub", "Login Account", "Login Account"]
         var loginEntryButton: XCUIElement?
         
         for label in loginButtonLabels {
             let button = app.buttons[label]
             if button.exists {
                 loginEntryButton = button
-                print("找到登录按钮: \(label)")
+                print("Found login button: \(label)")
                 break
             }
         }
         
-        // 如果精确匹配失败，尝试部分匹配
+        // If exact match fails, try partial match
         if loginEntryButton == nil {
             let allButtons = app.buttons.allElementsBoundByIndex
-            print("可用的按钮: \(allButtons.map { $0.label })")
+            print("Available buttons: \(allButtons.map { $0.label })")
             
             for button in allButtons {
                 let label = button.label.lowercased()
-                if label.contains("登录") || label.contains("login") || 
-                   label.contains("sign in") || label.contains("github") {
+                if label.contains("login") || label.contains("sign in") || 
+                   label.contains("github") {
                     loginEntryButton = button
-                    print("通过部分匹配找到登录按钮: \(button.label)")
+                    print("Found login button by partial match: \(button.label)")
                     break
                 }
             }
         }
         
         guard let finalLoginButton = loginEntryButton, finalLoginButton.exists else {
-            XCTFail("未能找到登录入口按钮，当前页面上的按钮: \(app.buttons.allElementsBoundByIndex.map { $0.label })")
+            XCTFail("Could not find login entry button, buttons on current page: \(app.buttons.allElementsBoundByIndex.map { $0.label })")
             return false
         }
         
         finalLoginButton.tap()
         
-        // 等待登录页面加载
+        // Wait for login page to load
         sleep(1)
         
-        // 打印点击登录按钮后的UI状态
-        print("点击登录按钮后的UI状态")
+        // Print UI state after clicking login button
+        print("UI state after clicking login button")
         printUIHierarchy()
         
         let waitPredicate = NSPredicate(format: "exists == true")
-        let titleElement = app.staticTexts["GitHub iOS客户端"]
+        let titleElement = app.staticTexts["GitHub iOS Client"]
         let expectation = XCTNSPredicateExpectation(predicate: waitPredicate, object: titleElement)
         let result = XCTWaiter.wait(for: [expectation], timeout: 3.0)
         
         return result == .completed
     }
     
-    // MARK: - 外观模式检查的替代方法
+    // MARK: - Alternative Appearance Check Method
     
     @MainActor
     func testAlternativeAppearanceCheck() throws {
-        // 注意：这个测试需要在模拟器中分别设置浅色模式和深色模式下运行
-        // 截取当前模式的屏幕截图
+        // Note: This test needs to be run separately in simulator with both light and dark mode
+        // Take screenshot of current mode
         let currentModeScreenshot = app.screenshot()
         
-        // 根据当前时间创建唯一的文件名
+        // Create unique file name based on current time
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd_HH-mm-ss"
         let dateString = dateFormatter.string(from: Date())
         
-        // 创建截图附件
+        // Create screenshot attachment
         let attachment = XCTAttachment(screenshot: currentModeScreenshot)
         attachment.name = "AppearanceMode_\(dateString)"
         attachment.lifetime = .keepAlways
         add(attachment)
         
-        // 告知测试者需要手动检查
-        print("请在测试报告中查看截图，并将其与在不同外观模式下运行的测试结果进行比较")
-        print("要全面测试深色模式，请在模拟器设置中切换到深色模式后再次运行此测试")
+        // Tell tester to manually check
+        print("Please check screenshots in test report and compare with test results from different appearance modes")
+        print("To fully test dark mode, please run this test again after switching to dark mode in simulator settings")
         
-        // 验证应用在当前模式下能够正常运行
-        XCTAssertTrue(app.isHittable, "应用应该处于可交互状态")
+        // Verify app works normally in current mode
+        XCTAssertTrue(app.isHittable, "App should be interactive")
     }
     
-    // MARK: - 简单的界面截图测试
+    // MARK: - Simple Interface Screenshot Test
     
     @MainActor
     func testSimpleScreenshot() throws {
-        // 简单的测试，只是捕获当前界面的截图
-        // 这个测试不会尝试改变设备方向或外观模式
+        // Simple test, just capture current interface screenshot
+        // This test will not try to change device direction or appearance mode
         
-        // 导航到主页
-        let homeTabNames = ["主页", "Home", "首页", "发现"]
+        // Navigate to homepage
+        let homeTabNames = ["Home", "Homepage", "Discover", "Main"]
         guard let homeTab = findTabByName(names: homeTabNames) else {
-            XCTFail("未能找到主页标签")
+            XCTFail("Could not find home tab")
             return
         }
         
         homeTab.tap()
         sleep(2)
         
-        // 捕获当前界面截图
+        // Capture current interface screenshot
         let screenshot = app.screenshot()
         let attachment = XCTAttachment(screenshot: screenshot)
         attachment.name = "Current Interface"
         attachment.lifetime = .keepAlways
         add(attachment)
         
-        // 简单地验证应用是可交互的
-        XCTAssertTrue(app.isHittable, "应用应该处于可交互状态")
+        // Simply verify app is interactive
+        XCTAssertTrue(app.isHittable, "App should be interactive")
     }
 }

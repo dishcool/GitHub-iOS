@@ -29,12 +29,13 @@ class AuthenticationService: AuthenticationServiceProtocol {
     
     private var oauthSwift: OAuth2Swift?
     
-    // 标记是否在模拟器环境中运行
-    private var isRunningOnSimulator: Bool {
+    // Flag indicating if running in simulator environment
+    private var isSimulator: Bool {
+        // Check if running in simulator environment
         #if targetEnvironment(simulator)
-            return true  // 在模拟器环境中启用自动登录功能
+        return true  // Enable auto-login in simulator environment
         #else
-            return false
+        return false
         #endif
     }
     
@@ -84,14 +85,14 @@ class AuthenticationService: AuthenticationServiceProtocol {
     }
     
     func authenticateWithBiometric(completion: @escaping (Result<User, Error>) -> Void) {
-        // 检测是否在模拟器环境下且有保存的令牌
-        if isRunningOnSimulator, let token = keychain.get(tokenKey) {
-            print("[Auth] 检测到模拟器环境且有已保存的令牌，自动使用令牌登录")
+        // Check if running in simulator environment and has saved token
+        if isSimulator, let token = keychain.get(tokenKey) {
+            print("[Auth] Detected simulator environment with saved token, automatically logging in with token")
             fetchUserProfile(token: token, completion: completion)
             return
         }
         
-        // 真机环境或模拟器没有令牌，走正常生物认证流程
+        // Real device environment or simulator without token, use normal biometric authentication flow
         if let token = keychain.get(tokenKey) {
             fetchUserProfile(token: token, completion: completion)
         } else {
@@ -139,4 +140,5 @@ class AuthenticationService: AuthenticationServiceProtocol {
         let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
         return String((0..<length).map { _ in letters.randomElement()! })
     }
+    
 } 

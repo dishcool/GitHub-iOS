@@ -21,10 +21,10 @@ class AuthViewModel: ObservableObject {
     private let tokenKey = "github_oauth_token"
     private var loginStartTime: Date?
     
-    // 检测是否在模拟器环境中运行
+    // Check if running in simulator environment
     private var isRunningOnSimulator: Bool {
         #if targetEnvironment(simulator)
-            return true  // 在模拟器环境中启用自动登录功能
+            return true  // Enable auto-login functionality in simulator environment
         #else
             return false
         #endif
@@ -33,9 +33,9 @@ class AuthViewModel: ObservableObject {
     init(authService: AuthenticationServiceProtocol = AuthenticationService()) {
         self.authService = authService
         
-        // 如果是模拟器环境且有保存的令牌，启动时自动检查登录状态
+        // If in simulator environment and have a saved token, automatically check login status at startup
         if isRunningOnSimulator && hasToken() {
-            print("[Auth] 应用启动，检测到模拟器环境且有已保存的令牌，自动检查登录状态")
+            print("[Auth] Application launch, detected simulator environment with saved token, automatically checking login status")
             checkAuthenticationStatus()
         }
     }
@@ -45,7 +45,7 @@ class AuthViewModel: ObservableObject {
     }
     
     func resetLoadingState() {
-        // 直接重置加载状态
+        // Directly reset loading state
         DispatchQueue.main.async {
             self.isLoading = false
             self.loginStartTime = nil
@@ -107,9 +107,9 @@ class AuthViewModel: ObservableObject {
     }
     
     func authenticateWithBiometric() {
-        // 如果在模拟器环境中且有令牌，直接尝试使用令牌登录
+        // If in simulator environment with a token, try to login directly using the token without biometric auth
         if isRunningOnSimulator && hasToken() {
-            print("[Auth] 检测到模拟器环境且有已保存的令牌，跳过生物认证直接尝试登录")
+            print("[Auth] Detected simulator environment with saved token, skipping biometric authentication and trying to login directly")
             isLoading = true
             
             authService.authenticateWithBiometric { [weak self] result in
@@ -127,7 +127,7 @@ class AuthViewModel: ObservableObject {
             return
         }
         
-        // 真机环境或模拟器没有令牌，走正常生物认证流程
+        // Real device environment or simulator without token, use normal biometric authentication flow
         let context = LAContext()
         var error: NSError?
         
@@ -159,7 +159,7 @@ class AuthViewModel: ObservableObject {
         }
     }
     
-    // 取消登录过程
+    // Cancel login process
     func cancelLogin() {
         DispatchQueue.main.async {
             self.isLoading = false

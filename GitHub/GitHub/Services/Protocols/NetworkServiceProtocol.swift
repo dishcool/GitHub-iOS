@@ -25,7 +25,7 @@ enum NetworkError: Error, Equatable {
     case unauthorized
     case rateLimitExceeded
     
-    // 实现 Equatable 协议所需的方法
+    // Method required for implementing the Equatable protocol
     static func == (lhs: NetworkError, rhs: NetworkError) -> Bool {
         switch (lhs, rhs) {
         case (.invalidEndpoint, .invalidEndpoint),

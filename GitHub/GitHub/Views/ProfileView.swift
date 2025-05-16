@@ -23,7 +23,7 @@ struct ProfileView: View {
             }
             .frame(height: 0)
             
-            // 显示刷新指示器
+            // Display refresh indicator
             if isRefreshing {
                 HStack {
                     Spacer()
@@ -36,10 +36,10 @@ struct ProfileView: View {
             
             VStack(spacing: 20) {
                 if viewModel.isLoadingUser {
-                    LoadingView(message: "加载用户信息...")
+                    LoadingView(message: "Loading user information...")
                         .frame(height: 200)
                 } else if let user = viewModel.user {
-                    // 用户信息
+                    // User information
                     VStack(spacing: 12) {
                         KFImage(URL(string: user.avatarUrl))
                             .placeholder {
@@ -72,7 +72,7 @@ struct ProfileView: View {
                             VStack {
                                 Text("\(user.followers ?? 0)")
                                     .font(.headline)
-                                Text("粉丝")
+                                Text("Followers")
                                     .font(.subheadline)
                                     .foregroundColor(.secondary)
                             }
@@ -80,7 +80,7 @@ struct ProfileView: View {
                             VStack {
                                 Text("\(user.following ?? 0)")
                                     .font(.headline)
-                                Text("关注")
+                                Text("Following")
                                     .font(.subheadline)
                                     .foregroundColor(.secondary)
                             }
@@ -88,14 +88,14 @@ struct ProfileView: View {
                             VStack {
                                 Text("\(user.publicRepos ?? 0)")
                                     .font(.headline)
-                                Text("仓库")
+                                Text("Repositories")
                                     .font(.subheadline)
                                     .foregroundColor(.secondary)
                             }
                         }
                         .padding(.top, 8)
                         
-                        // 用户其他信息
+                        // User additional information
                         VStack(alignment: .leading, spacing: 8) {
                             if let location = user.location, !location.isEmpty {
                                 HStack {
@@ -115,12 +115,12 @@ struct ProfileView: View {
                         }
                         .padding(.top, 8)
                         
-                        // 登出按钮（仅当查看自己的资料时显示）
+                        // Logout button (only shown when viewing your own profile)
                         if authViewModel.currentUser?.id == user.id {
                             Button(action: {
                                 authViewModel.logout()
                             }) {
-                                Text("退出登录")
+                                Text("Log Out")
                                     .font(.headline)
                                     .foregroundColor(.white)
                                     .padding()
@@ -137,18 +137,18 @@ struct ProfileView: View {
                     .cornerRadius(10)
                     .padding(.horizontal)
                     
-                    // 仓库列表
+                    // Repository list
                     VStack(alignment: .leading) {
-                        Text("仓库")
+                        Text("Repositories")
                             .font(.title2)
                             .fontWeight(.bold)
                             .padding(.horizontal)
                         
                         if viewModel.isLoadingRepos {
-                            LoadingView(message: "加载仓库...")
+                            LoadingView(message: "Loading repositories...")
                                 .frame(height: 150)
                         } else if viewModel.repositories.isEmpty {
-                            Text("没有公开的仓库")
+                            Text("No public repositories")
                                 .foregroundColor(.secondary)
                                 .frame(maxWidth: .infinity, alignment: .center)
                                 .padding()
@@ -165,14 +165,14 @@ struct ProfileView: View {
                         }
                     }
                 } else if let error = viewModel.error {
-                    Text("加载失败: \(error.localizedDescription)")
+                    Text("Loading failed: \(error.localizedDescription)")
                         .foregroundColor(.red)
                         .padding()
                 }
             }
             .padding(.vertical)
         }
-        .navigationTitle(username != nil ? username! : "我的资料")
+        .navigationTitle(username != nil ? username! : "My Profile")
         .onAppear {
             if let username = username {
                 viewModel.loadUserProfile(username: username)
@@ -182,7 +182,7 @@ struct ProfileView: View {
             }
         }
         .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
-            // 检测下拉刷新
+            // Detect pull-to-refresh
             if value > 70 && !isRefreshing && value > previousScrollOffset {
                 isRefreshing = true
                 refresh()
@@ -191,11 +191,11 @@ struct ProfileView: View {
         }
     }
     
-    // 刷新函数
+    // Refresh function
     private func refresh() {
         viewModel.refresh()
         
-        // 模拟刷新延迟
+        // Simulate refresh delay
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             self.isRefreshing = false
         }

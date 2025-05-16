@@ -7,7 +7,7 @@
 
 import Foundation
 
-/// 代表GitHub组织的模型
+/// Model representing a GitHub organization
 struct Organization: Identifiable, Codable {
     let id: Int
     let login: String

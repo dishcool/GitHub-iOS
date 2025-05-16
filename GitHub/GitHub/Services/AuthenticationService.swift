@@ -29,10 +29,6 @@ enum AuthenticationError: Error {
 class AuthenticationService: AuthenticationServiceProtocol {
     private let keychain = KeychainSwift()
     private let networkService: NetworkServiceProtocol
-    private let clientID = "Ov23lijpUq87uT9pa2yD" // GitHub OAuth client ID
-    private let clientSecret = "26a8caee7663039413011fb35dde3daf9feedb29" // GitHub OAuth client secret
-    private let redirectURI = "github20250516junjian://callback" // This should match your GitHub OAuth app configuration
-    private let tokenKey = "github_oauth_token"
     
     private var oauthSwift: OAuth2Swift?
     
@@ -51,10 +47,10 @@ class AuthenticationService: AuthenticationServiceProtocol {
     /// - Parameter completion: Callback with the result containing the authenticated user or an error
     func authenticate(completion: @escaping (Result<User, Error>) -> Void) {
         oauthSwift = OAuth2Swift(
-            consumerKey: clientID,
-            consumerSecret: clientSecret,
-            authorizeUrl: "https://github.com/login/oauth/authorize",
-            accessTokenUrl: "https://github.com/login/oauth/access_token",
+            consumerKey: AppConstants.GitHub.clientID,
+            consumerSecret: AppConstants.GitHub.clientSecret,
+            authorizeUrl: AppConstants.GitHub.authorizeUrl,
+            accessTokenUrl: AppConstants.GitHub.accessTokenUrl,
             responseType: "code"
         )
         
@@ -73,8 +69,8 @@ class AuthenticationService: AuthenticationServiceProtocol {
         
         let state = generateState(withLength: 20)
         let _ = oauthSwift.authorize(
-            withCallbackURL: URL(string: redirectURI)!,
-            scope: "user repo",
+            withCallbackURL: URL(string: AppConstants.GitHub.redirectURI)!,
+            scope: AppConstants.GitHub.scopes,
             state: state) { [weak self] result in
                 switch result {
                 case .success(let response):
@@ -95,7 +91,7 @@ class AuthenticationService: AuthenticationServiceProtocol {
     func authenticateWithBiometric(completion: @escaping (Result<User, Error>) -> Void) {
         // Check if running in simulator environment and has saved token
         if isSimulator, let token = KeychainService.shared.retrieveToken() {
-            print("[Auth] Detected simulator environment with saved token, automatically logging in with token")
+            print(AppStrings.Auth.simulatorAutoLogin)
             fetchUserProfile(token: token, completion: completion)
             return
         }
@@ -139,10 +135,12 @@ class AuthenticationService: AuthenticationServiceProtocol {
     ///   - token: GitHub OAuth token
     ///   - completion: Callback with the result containing the user profile or an error
     private func fetchUserProfile(token: String, completion: @escaping (Result<User, Error>) -> Void) {
-        let headers = ["Authorization": "token \(token)"]
+        let headers = [
+            AppConstants.Network.Headers.authorization: String(format: AppConstants.Network.HeaderValues.tokenFormat, token)
+        ]
         
         networkService.request(
-            endpoint: "https://api.github.com/user",
+            endpoint: AppConstants.GitHub.apiBaseUrl + AppConstants.GitHub.Endpoints.user,
             method: .get,
             parameters: [:],
             headers: headers,

@@ -14,7 +14,6 @@ class KeychainService: KeychainServiceProtocol {
     static let shared = KeychainService()
     
     private let keychain = KeychainSwift()
-    private let tokenKey = "github_oauth_token"
     
     private init() {
         // Private initializer to enforce singleton pattern
@@ -25,20 +24,20 @@ class KeychainService: KeychainServiceProtocol {
     /// - Returns: True if storage was successful
     @discardableResult
     func storeToken(_ token: String) -> Bool {
-        return keychain.set(token, forKey: tokenKey)
+        return keychain.set(token, forKey: AppConstants.Keychain.tokenKey)
     }
     
     /// Retrieve the stored token from keychain
     /// - Returns: The stored token, or nil if not found
     func retrieveToken() -> String? {
-        return keychain.get(tokenKey)
+        return keychain.get(AppConstants.Keychain.tokenKey)
     }
     
     /// Delete the stored token
     /// - Returns: True if deletion was successful
     @discardableResult
     func deleteToken() -> Bool {
-        return keychain.delete(tokenKey)
+        return keychain.delete(AppConstants.Keychain.tokenKey)
     }
     
     /// Check if a token exists in the keychain

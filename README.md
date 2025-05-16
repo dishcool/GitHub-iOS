@@ -188,12 +188,37 @@ GitHub-iOS/
 │   │   ├── ViewModels/     # View models (corresponding to each feature)
 │   │   ├── Services/       # Service layer
 │   │   │   └── Protocols/  # Service protocols
+│   │   ├── Utilities/      # Utility classes and extensions
+│   │   │   ├── AppConstants.swift # Centralized constants management (API keys, endpoints, UI values)
+│   │   │   └── AppStrings.swift   # Centralized string constants (UI text, error messages, logs)
 │   │   └── Assets.xcassets # Application resources
 │   ├── GitHubTests/        # Unit tests
 │   └── GitHubUITests/      # UI tests
 ├── Screenshots/            # Application screenshots
 └── Tests/                  # Test documentation
 ```
+
+### Utilities
+
+#### Constants Management
+
+The project implements a centralized approach for managing constants and strings:
+
+- **AppConstants.swift**: Provides structured access to all constants used throughout the app:
+  - GitHub API related constants (client ID, secrets, endpoints)
+  - Keychain storage keys
+  - Network parameters (timeouts, cache TTLs, HTTP headers)
+  - UI related values (animations, sizes, padding)
+  - System image names
+
+- **AppStrings.swift**: Centralizes all string literals in the application:
+  - Authentication related strings (button texts, messages)
+  - Tab bar item titles
+  - Network log formats
+  - Cache related messages
+  - Error messages
+
+This organization improves maintainability by keeping all constants in one place and makes localization easier.
 
 ## Testing
 

@@ -52,7 +52,9 @@ protocol NetworkCacheProtocol {
     
     /// Remove expired entries from the cache
     /// - Parameter maxAge: Maximum age in seconds for entries to remain valid
-    func removeExpired(maxAge: TimeInterval)
+    /// - Returns: Number of expired entries removed
+    @discardableResult
+    func removeExpired(maxAge: TimeInterval) -> Int
 }
 
 /// In-memory implementation of the network cache
@@ -87,7 +89,7 @@ class InMemoryNetworkCache: NetworkCacheProtocol {
         cache.setObject(entry, forKey: key as NSString)
         timestamps[key] = entry.timestamp
         
-        print("💾 Cached response for key: \(key)")
+        print(String(format: AppStrings.Cache.storedInCache, key))
     }
     
     func retrieve(forKey key: String) -> CacheEntry? {
@@ -108,7 +110,7 @@ class InMemoryNetworkCache: NetworkCacheProtocol {
         cache.removeObject(forKey: key as NSString)
         timestamps.removeValue(forKey: key)
         
-        print("🧹 Removed cache for key: \(key)")
+        print(String(format: AppStrings.Cache.removedFromCache, key))
     }
     
     func removeAll() {
@@ -118,10 +120,11 @@ class InMemoryNetworkCache: NetworkCacheProtocol {
         cache.removeAllObjects()
         timestamps.removeAll()
         
-        print("🧹 Cleared all cached responses")
+        print(AppStrings.Cache.clearedAllCache)
     }
     
-    func removeExpired(maxAge: TimeInterval) {
+    @discardableResult
+    func removeExpired(maxAge: TimeInterval) -> Int {
         lock.lock()
         defer { lock.unlock() }
         
@@ -134,7 +137,9 @@ class InMemoryNetworkCache: NetworkCacheProtocol {
         }
         
         if !expiredKeys.isEmpty {
-            print("⏱️ Removed \(expiredKeys.count) expired cache entries")
+            print(String(format: AppStrings.Cache.removedExpiredEntries, expiredKeys.count))
         }
+        
+        return expiredKeys.count
     }
 } 

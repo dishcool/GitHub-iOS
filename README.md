@@ -55,43 +55,27 @@
 
 ## 应用展示
 
-### 应用图标
-
 <div align="center">
-  <img src="Designs/AppIcon.svg" width="200" alt="GitHub iOS应用图标"/>
-  <p><em>简洁的GitHub猫（Octocat）设计</em></p>
-</div>
-
-### 界面预览
-
-<div align="center">
-  <h4>登录与认证</h4>
   <p>
+    <img src="Designs/AppIcon.svg" width="150" alt="GitHub iOS应用图标"/>
     <img src="Screenshots/Login.png" width="250" alt="登录界面"/>
     <img src="Screenshots/Login-Bio.png" width="250" alt="生物识别登录"/>
   </p>
-  <p><em>左: 登录界面 | 右: 生物识别登录</em></p>
+  <p><em>应用图标 | 登录界面 | 生物识别登录</em></p>
 
-  <h4>内容浏览</h4>
   <p>
     <img src="Screenshots/Popular List.png" width="250" alt="热门仓库列表"/>
     <img src="Screenshots/Repository Details.png" width="250" alt="仓库详情"/>
     <img src="Screenshots/Profile.png" width="250" alt="个人资料"/>
   </p>
-  <p><em>左: 热门仓库列表 | 中: 仓库详情 | 右: 个人资料</em></p>
+  <p><em>热门仓库列表 | 仓库详情 | 个人资料</em></p>
 
-  <h4>搜索功能</h4>
   <p>
     <img src="Screenshots/Search Repo.png" width="250" alt="仓库搜索"/>
     <img src="Screenshots/Search User.png" width="250" alt="用户搜索"/>
-  </p>
-  <p><em>左: 仓库搜索 | 右: 用户搜索</em></p>
-
-  <h4>错误处理</h4>
-  <p>
     <img src="Screenshots/Error.png" width="250" alt="错误页面"/>
   </p>
-  <p><em>优化的错误提示界面 - 简洁明了的错误展示与重试选项</em></p>
+  <p><em>仓库搜索 | 用户搜索 | 错误处理界面</em></p>
 </div>
 
 ## 架构设计

@@ -21,8 +21,23 @@ class AuthViewModel: ObservableObject {
     private let tokenKey = "github_oauth_token"
     private var loginStartTime: Date?
     
+    // 检测是否在模拟器环境中运行
+    private var isRunningOnSimulator: Bool {
+        #if targetEnvironment(simulator)
+            return true  // 在模拟器环境中启用自动登录功能
+        #else
+            return false
+        #endif
+    }
+    
     init(authService: AuthenticationServiceProtocol = AuthenticationService()) {
         self.authService = authService
+        
+        // 如果是模拟器环境且有保存的令牌，启动时自动检查登录状态
+        if isRunningOnSimulator && hasToken() {
+            print("[Auth] 应用启动，检测到模拟器环境且有已保存的令牌，自动检查登录状态")
+            checkAuthenticationStatus()
+        }
     }
     
     func hasToken() -> Bool {
@@ -92,6 +107,27 @@ class AuthViewModel: ObservableObject {
     }
     
     func authenticateWithBiometric() {
+        // 如果在模拟器环境中且有令牌，直接尝试使用令牌登录
+        if isRunningOnSimulator && hasToken() {
+            print("[Auth] 检测到模拟器环境且有已保存的令牌，跳过生物认证直接尝试登录")
+            isLoading = true
+            
+            authService.authenticateWithBiometric { [weak self] result in
+                DispatchQueue.main.async {
+                    self?.isLoading = false
+                    switch result {
+                    case .success(let user):
+                        self?.isAuthenticated = true
+                        self?.currentUser = user
+                    case .failure(let error):
+                        self?.error = error
+                    }
+                }
+            }
+            return
+        }
+        
+        // 真机环境或模拟器没有令牌，走正常生物认证流程
         let context = LAContext()
         var error: NSError?
         

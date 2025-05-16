@@ -15,6 +15,57 @@
 - **中文本地化**：使用Localization文件实现中文界面
 - **适配多种屏幕**：支持iPhone和iPad的各种屏幕尺寸
 
+## 应用截图
+
+<div align="center">
+  <h3>登录与认证</h3>
+</div>
+
+<p align="center">
+  <img src="Screenshots/Login.png" width="250" alt="登录界面"/>
+  <img src="Screenshots/Login-Bio.png" width="250" alt="生物识别登录"/>
+</p>
+<p align="center">
+  <em>左: 登录界面 | 右: 生物识别登录</em>
+</p>
+
+<div align="center">
+  <h3>内容浏览</h3>
+</div>
+
+<p align="center">
+  <img src="Screenshots/Popular List.png" width="250" alt="热门仓库列表"/>
+  <img src="Screenshots/Repository Details.png" width="250" alt="仓库详情"/>
+  <img src="Screenshots/Profile.png" width="250" alt="个人资料"/>
+</p>
+<p align="center">
+  <em>左: 热门仓库列表 | 中: 仓库详情 | 右: 个人资料</em>
+</p>
+
+<div align="center">
+  <h3>搜索功能</h3>
+</div>
+
+<p align="center">
+  <img src="Screenshots/Search Repo.png" width="250" alt="仓库搜索"/>
+  <img src="Screenshots/Search User.png" width="250" alt="用户搜索"/>
+</p>
+<p align="center">
+  <em>左: 仓库搜索 | 右: 用户搜索</em>
+</p>
+
+<div align="center">
+  <h3>主要特点</h3>
+  <p align="center">
+    ✅ 简洁现代的界面设计<br/>
+    ✅ 深色模式完全支持<br/>
+    ✅ 中文本地化<br/>
+    ✅ 流畅的用户体验<br/>
+    ✅ 适配各种iOS设备<br/>
+    ✅ 模拟器自动登录支持
+  </p>
+</div>
+
 ## 项目设置
 
 ### 系统要求
@@ -120,6 +171,7 @@
 - 支持GitHub OAuth认证
 - 使用KeychainSwift安全存储令牌
 - 支持生物识别快速登录（Face ID/Touch ID）
+- 在模拟器环境下自动登录，无需生物认证
 
 ### UI设计
 
@@ -160,3 +212,28 @@
 ## 许可证
 
 该项目使用 MIT 许可证
+
+### 开发与测试增强功能
+
+#### 模拟器自动登录
+
+为提高开发和测试效率，本应用特别实现了在模拟器环境下的自动登录功能：
+
+- 在模拟器中运行时，如果用户之前已登录（有保存的令牌），应用将自动使用该令牌尝试登录，无需进行生物认证
+- 登录页面会显示明确的提示和"一键自动登录"按钮，提供更佳的开发体验
+- 此功能仅在模拟器环境中启用，不影响真机上的生物认证安全机制
+- 通过条件编译指令 `#if targetEnvironment(simulator)` 实现环境检测
+
+这一功能大大提高了在模拟器中的开发和测试效率，减少了因模拟器不支持生物认证而导致的开发障碍。
+
+## 使用说明
+
+### 模拟器中的登录方式
+
+在模拟器环境中使用本应用时，登录流程如下：
+
+1. 首次使用需通过 GitHub OAuth 完成正常登录流程，登录成功后令牌将保存在钥匙串中
+2. 之后再次启动应用时，系统将检测到模拟器环境并自动尝试使用已保存的令牌登录
+3. 如果需要重新登录，可以点击个人资料页中的"退出登录"按钮，然后通过 GitHub OAuth 重新登录
+
+这种设计极大地简化了在模拟器中的开发和测试过程，特别是在反复启动应用进行测试时，无需每次都经过完整的 OAuth 流程或面对无法使用的生物识别提示。

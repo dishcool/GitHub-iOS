@@ -29,6 +29,15 @@ class AuthenticationService: AuthenticationServiceProtocol {
     
     private var oauthSwift: OAuth2Swift?
     
+    // 标记是否在模拟器环境中运行
+    private var isRunningOnSimulator: Bool {
+        #if targetEnvironment(simulator)
+            return true  // 在模拟器环境中启用自动登录功能
+        #else
+            return false
+        #endif
+    }
+    
     init(networkService: NetworkServiceProtocol = NetworkService()) {
         self.networkService = networkService
     }
@@ -75,6 +84,14 @@ class AuthenticationService: AuthenticationServiceProtocol {
     }
     
     func authenticateWithBiometric(completion: @escaping (Result<User, Error>) -> Void) {
+        // 检测是否在模拟器环境下且有保存的令牌
+        if isRunningOnSimulator, let token = keychain.get(tokenKey) {
+            print("[Auth] 检测到模拟器环境且有已保存的令牌，自动使用令牌登录")
+            fetchUserProfile(token: token, completion: completion)
+            return
+        }
+        
+        // 真机环境或模拟器没有令牌，走正常生物认证流程
         if let token = keychain.get(tokenKey) {
             fetchUserProfile(token: token, completion: completion)
         } else {

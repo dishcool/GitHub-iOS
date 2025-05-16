@@ -11,6 +11,15 @@ struct LoginView: View {
     @EnvironmentObject private var authViewModel: AuthViewModel
     @State private var hasToken: Bool = false
     
+    // 检测是否在模拟器环境中运行
+    private var isRunningOnSimulator: Bool {
+        #if targetEnvironment(simulator)
+            return true  // 在模拟器环境中启用自动登录功能
+        #else
+            return false
+        #endif
+    }
+    
     var body: some View {
         VStack(spacing: 30) {
             // Logo and Title
@@ -30,6 +39,27 @@ struct LoginView: View {
                     .foregroundColor(.secondary)
             }
             .padding(.top, 50)
+            
+            // 在模拟器环境下显示提示信息
+            if isRunningOnSimulator && hasToken {
+                VStack(spacing: 8) {
+                    Text("检测到模拟器环境")
+                        .font(.headline)
+                        .foregroundColor(.blue)
+                    
+                    Text("已有账户将自动登录，无需生物识别")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                }
+                .padding(.horizontal)
+                .padding(.vertical, 10)
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(Color.blue.opacity(0.1))
+                )
+                .padding(.horizontal, 30)
+            }
             
             Spacer()
             
@@ -55,8 +85,27 @@ struct LoginView: View {
                     }
                 }
                 
-                // 只有之前登录过的用户会显示生物识别登录按钮
-                if hasToken {
+                // 对于模拟器环境，有令牌时显示一键自动登录按钮
+                if isRunningOnSimulator && hasToken {
+                    Button(action: {
+                        authViewModel.authenticateWithBiometric()
+                    }) {
+                        HStack {
+                            Image(systemName: "arrow.right.circle.fill")
+                                .foregroundColor(.white)
+                            
+                            Text("一键自动登录")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.green)
+                        .cornerRadius(10)
+                    }
+                }
+                // 真机环境下，有令牌时显示生物识别登录按钮
+                else if hasToken {
                     Button(action: {
                         authViewModel.authenticateWithBiometric()
                     }) {

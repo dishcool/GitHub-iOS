@@ -12,7 +12,7 @@ import SwiftyJSON
 class NetworkService: NetworkServiceProtocol {
     // 你可以在这里设置你的GitHub Personal Access Token
     // 如果没有，可以通过 https://github.com/settings/tokens 创建一个
-    private let githubToken: String? = "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"
+    private let githubToken: String? = "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"
     
     private var defaultHeaders: [String: String] {
         var headers = [

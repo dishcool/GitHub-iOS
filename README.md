@@ -82,7 +82,7 @@
   <p>
     <img src="Screenshots/Search User.png" width="250" alt="用户搜索"/>
     <img src="Screenshots/Error.png" width="250" alt="错误页面"/>
-    <img src="Screenshots/Issues List.png" width="250" alt="Issues列表"/>
+    <img src="Screenshots/Issue List.png" width="250" alt="Issues列表"/>
   </p>
   <p><em>用户搜索 | 错误处理界面 | Issues列表</em></p>
 

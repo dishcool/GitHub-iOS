@@ -119,8 +119,3 @@ struct RepositoryCard: View {
     }
 }
 
-#Preview {
-    RepositoryCard(repository: Repository.placeholder)
-        .padding()
-        .previewLayout(.sizeThatFits)
-} 

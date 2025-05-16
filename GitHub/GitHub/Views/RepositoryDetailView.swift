@@ -103,6 +103,44 @@ struct RepositoryDetailView: View {
                             }
                         }
                         
+                        // 添加查看代码和Issues的按钮
+                        HStack(spacing: 12) {
+                            NavigationLink(
+                                destination: WebViewPage(
+                                    url: URL(string: "https://github.com/\(owner)/\(repoName)")!,
+                                    title: "代码目录"
+                                )
+                            ) {
+                                HStack {
+                                    Image(systemName: "doc.text.fill")
+                                    Text("查看代码")
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.green)
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                            }
+                            
+                            NavigationLink(
+                                destination: WebViewPage(
+                                    url: URL(string: "https://github.com/\(owner)/\(repoName)/issues")!,
+                                    title: "Issues列表"
+                                )
+                            ) {
+                                HStack {
+                                    Image(systemName: "exclamationmark.circle.fill")
+                                    Text("查看Issues")
+                                }
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.orange)
+                                .foregroundColor(.white)
+                                .cornerRadius(10)
+                            }
+                        }
+                        .padding(.top, 8)
+                        
                         // 在浏览器中打开链接按钮
                         Button(action: {
                             if let url = URL(string: repository.htmlUrl) {

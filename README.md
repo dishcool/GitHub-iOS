@@ -86,6 +86,12 @@
     <img src="Screenshots/Search User.png" width="250" alt="用户搜索"/>
   </p>
   <p><em>左: 仓库搜索 | 右: 用户搜索</em></p>
+
+  <h4>错误处理</h4>
+  <p>
+    <img src="Screenshots/Error.png" width="250" alt="错误页面"/>
+  </p>
+  <p><em>优化的错误提示界面 - 简洁明了的错误展示与重试选项</em></p>
 </div>
 
 ## 架构设计

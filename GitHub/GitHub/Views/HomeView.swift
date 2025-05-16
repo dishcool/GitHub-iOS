@@ -121,46 +121,57 @@ struct HomeView: View {
                     LoadingView(message: "正在加载热门仓库...")
                         .frame(height: 300)
                 } else if let errorMessage = viewModel.errorMessage {
-                    VStack(spacing: 16) {
-                        Text(errorMessage)
-                            .foregroundColor(.red)
-                            .multilineTextAlignment(.center)
-                            .padding()
+                    VStack(spacing: 24) {
+                        Spacer()
+                            .frame(height: 20)
                         
-                        HStack(spacing: 16) {
-                            Button(action: {
-                                // 使用缓存重试
-                                viewModel.useCacheForRequests = true
-                                viewModel.fetchTrendingRepositories()
-                            }) {
-                                HStack {
-                                    Image(systemName: "arrow.clockwise")
-                                    Text("使用缓存加载")
-                                }
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 12)
-                                .background(Color.green)
-                                .foregroundColor(.white)
-                                .cornerRadius(8)
+                        // 错误图标
+                        Image(systemName: "exclamationmark.icloud.fill")
+                            .font(.system(size: 60))
+                            .foregroundColor(.red.opacity(0.8))
+                            .padding(.bottom, 10)
+                        
+                        Text("加载失败")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                        
+                        Text(errorMessage)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 32)
+                            .padding(.bottom, 10)
+                        
+                        Button(action: {
+                            // 重试刷新
+                            viewModel.refreshRepositories()
+                        }) {
+                            HStack {
+                                Image(systemName: "arrow.triangle.2.circlepath")
+                                Text("重试刷新")
                             }
-                            
-                            Button(action: {
-                                // 强制刷新
-                                viewModel.refreshRepositories()
-                            }) {
-                                HStack {
-                                    Image(systemName: "arrow.triangle.2.circlepath")
-                                    Text("强制刷新")
-                                }
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 12)
-                                .background(Color.blue)
-                                .foregroundColor(.white)
-                                .cornerRadius(8)
-                            }
+                            .padding(.horizontal, 24)
+                            .padding(.vertical, 12)
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(Color.blue)
+                            )
+                            .foregroundColor(.white)
                         }
+                        .buttonStyle(PlainButtonStyle())
+                        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+                        
+                        Spacer()
+                            .frame(height: 20)
                     }
-                    .padding(.top, 50)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 50)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color(.systemBackground))
+                            .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 5)
+                    )
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 10)
                 } else if viewModel.repositories.isEmpty {
                     Text("没有找到符合条件的仓库")
                         .foregroundColor(.secondary)

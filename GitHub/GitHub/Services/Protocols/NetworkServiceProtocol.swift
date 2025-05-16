@@ -14,7 +14,7 @@ enum HTTPMethod: String {
     case delete = "DELETE"
 }
 
-enum NetworkError: Error {
+enum NetworkError: Error, Equatable {
     case invalidEndpoint
     case invalidResponse
     case decodingError
@@ -24,6 +24,25 @@ enum NetworkError: Error {
     case noData
     case unauthorized
     case rateLimitExceeded
+    
+    // 实现 Equatable 协议所需的方法
+    static func == (lhs: NetworkError, rhs: NetworkError) -> Bool {
+        switch (lhs, rhs) {
+        case (.invalidEndpoint, .invalidEndpoint),
+             (.invalidResponse, .invalidResponse),
+             (.decodingError, .decodingError),
+             (.unknown, .unknown),
+             (.invalidURL, .invalidURL),
+             (.noData, .noData),
+             (.unauthorized, .unauthorized),
+             (.rateLimitExceeded, .rateLimitExceeded):
+            return true
+        case (.serverError(let lhsCode), .serverError(let rhsCode)):
+            return lhsCode == rhsCode
+        default:
+            return false
+        }
+    }
 }
 
 protocol NetworkServiceProtocol {

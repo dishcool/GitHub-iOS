@@ -52,7 +52,7 @@ class RepositoryDetailViewModel: ObservableObject {
         // GitHub API endpoint for fetching README content
         let endpoint = "https://api.github.com/repos/\(owner)/\(name)/readme"
         
-        networkService.request(endpoint: endpoint, method: .get) { [weak self] (result: Result<ReadmeResponse, Error>) in
+        networkService.request(endpoint: endpoint, method: .get) { [weak self] (result: Result<DetailedReadmeResponse, Error>) in
             DispatchQueue.main.async {
                 guard let self else { return }
                 self.isLoadingReadme = false
@@ -91,7 +91,7 @@ class RepositoryDetailViewModel: ObservableObject {
     }()
 }
 
-struct ReadmeResponse: Codable {
+struct DetailedReadmeResponse: Codable {
     let name: String
     let path: String
     let content: String

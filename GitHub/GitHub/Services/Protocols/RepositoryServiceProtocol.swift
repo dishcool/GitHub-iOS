@@ -12,6 +12,7 @@ protocol RepositoryServiceProtocol {
     func getRepositoriesForUser(username: String, page: Int, perPage: Int, useCache: Bool, completion: @escaping (Result<[Repository], Error>) -> Void)
     func getRepositoryDetails(owner: String, name: String, useCache: Bool, completion: @escaping (Result<Repository, Error>) -> Void)
     func searchRepositories(query: String, page: Int, perPage: Int, useCache: Bool, completion: @escaping (Result<[Repository], Error>) -> Void)
+    func fetchRepositoryReadme(owner: String, name: String, completion: @escaping (Result<String, Error>) -> Void)
     
     // 清除所有缓存
     func clearCache()

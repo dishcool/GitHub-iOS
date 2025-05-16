@@ -16,7 +16,7 @@ class RepositoryService: RepositoryServiceProtocol {
         self.networkService = networkService
     }
     
-    func getTrendingRepositories(language: String? = nil, timeSpan: String? = nil, useCache: Bool = true, completion: @escaping (Result<[Repository], Error>) -> Void) {
+    public func getTrendingRepositories(language: String? = nil, timeSpan: String? = nil, useCache: Bool = true, completion: @escaping (Result<[Repository], Error>) -> Void) {
         // 构建查询字符串
         var query = "stars:>100"
         
@@ -97,6 +97,28 @@ class RepositoryService: RepositoryServiceProtocol {
         }
     }
     
+    func fetchRepositoryReadme(owner: String, name: String, completion: @escaping (Result<String, Error>) -> Void) {
+        let endpoint = "https://api.github.com/repos/\(owner)/\(name)/readme"
+        
+        networkService.request(endpoint: endpoint, method: .get, parameters: nil, headers: nil, useCache: true) { (result: Result<ReadmeResponse, Error>) in
+            switch result {
+            case .success(let response):
+                if response.encoding.lowercased() == "base64", let data = Data(base64Encoded: response.content) {
+                    if let decoded = String(data: data, encoding: .utf8) {
+                        completion(.success(decoded))
+                    } else {
+                        completion(.failure(NetworkError.decodingError))
+                    }
+                } else {
+                    completion(.success(response.content))
+                }
+                
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+    
     // 清除所有缓存
     func clearCache() {
         networkService.clearCache()
@@ -130,4 +152,10 @@ struct SearchRepositoriesResponse: Codable {
         case incompleteResults = "incomplete_results"
         case items
     }
+}
+
+// Response structure for README API
+struct ReadmeResponse: Codable {
+    let content: String
+    let encoding: String
 } 

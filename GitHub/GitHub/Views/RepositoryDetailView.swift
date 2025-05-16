@@ -137,8 +137,13 @@ struct RepositoryDetailView: View {
                             LoadingView(message: "加载README...")
                                 .frame(height: 200)
                         } else if let readme = viewModel.readme {
-                            Text(AttributedString(readme))
-                                .padding()
+                            if #available(iOS 15, *) {
+                                Text(AttributedString(readme))
+                                    .padding()
+                            } else {
+                                Text(readme.string)
+                                    .padding()
+                            }
                         } else {
                             Text("无法加载README或该仓库不包含README文件")
                                 .foregroundColor(.secondary)

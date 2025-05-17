@@ -231,6 +231,32 @@ Features:
 - Shared helper methods to improve test stability
 - Automatic screenshot capture for UI verification
 
+## Installation
+
+### Pre-built IPA
+
+A pre-built IPA file is available at `Release/1.0/GitHub.ipa`. This package was signed with a personal development certificate and requires re-signing before installation on other devices.
+
+### Re-signing the IPA
+
+To install the pre-built IPA on your device, you'll need to re-sign it with your own Apple Developer certificate:
+
+1. **Requirements**:
+   - Mac with Xcode installed
+   - Valid Apple Developer account
+   - iOS Device
+
+2. **Re-signing Process**:
+   - Extract the IPA file (rename to .zip and extract)
+   - Use the `codesign` command line tool or Xcode's re-signing capabilities
+   - Alternatively, use third-party tools like [iOS App Signer](https://github.com/DanTheMan827/ios-app-signer)
+
+3. **Installation after Re-signing**:
+   - Use Apple Configurator
+   - Or install via Xcode by connecting your device
+
+> Note: Re-signing is necessary because the IPA is signed with a personal development certificate that is not valid for other devices.
+
 ## Development and Support
 
 ### Development Team
